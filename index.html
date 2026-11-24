@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://czsccnwayexwiewyutkp.supabase.co wss://czsccnwayexwiewyutkp.supabase.co; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050a05">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Сололевелинг">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Сололевелинг</title>
+<script src="vendor/supabase.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap">
+<style>
+:root{--bg:#dcefd6;--fg:#0b4d16;--dim:#5b8f63;--amb:#8a5a00;--pan:#cfe6c8;--c0:#0b4d16;--c1:#8a5a00;--c2:#0b5a52;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a05;--fg:#2bff4f;--dim:#0f7a24;--amb:#ffb000;--pan:#08140a;--c0:#2bff4f;--c1:#ffb000;--c2:#2bffd0}}
+:root[data-theme="dark"]{--bg:#050a05;--fg:#2bff4f;--dim:#0f7a24;--amb:#ffb000;--pan:#08140a;--c0:#2bff4f;--c1:#ffb000;--c2:#2bffd0}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 'Share Tech Mono',ui-monospace,monospace;text-shadow:0 0 4px color-mix(in srgb,var(--fg) 40%,transparent)}
+body.crt::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
+body.crt main{animation:fl 5s infinite}
+@keyframes fl{0%,100%{opacity:1}50%{opacity:.965}}
+@keyframes pu{50%{opacity:.25}}
+.pu{animation:pu 1.4s infinite}
+main{padding:10px 12px 84px;max-width:640px;margin:0 auto}
+h1,h2{font:400 28px/1 'VT323',monospace;margin:0 0 8px;letter-spacing:1px}
+h2{font-size:24px}
+.pn{position:relative;border:1px solid var(--dim);background:var(--pan);padding:10px;margin:10px 0}
+.pn::before,.pn::after{content:"";position:absolute;width:8px;height:8px;border:2px solid var(--fg)}
+.pn::before{left:-2px;top:-2px;border-right:0;border-bottom:0}
+.pn::after{right:-2px;bottom:-2px;border-left:0;border-top:0}
+button{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--fg);padding:8px 10px;min-height:44px;text-transform:uppercase;cursor:pointer;text-shadow:inherit}
+button.on{background:var(--fg);color:var(--bg);text-shadow:none}
+input,textarea{font:inherit;color:inherit;background:transparent;border:1px solid var(--dim);padding:8px;min-height:44px;width:84px;box-sizing:border-box}
+select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--dim);min-height:44px;padding:6px}
+.rw{display:flex;align-items:center;gap:8px;padding:10px 6px;border-bottom:1px solid var(--dim);min-height:44px;cursor:pointer}
+.rw .n{flex:1}
+.rw .bar{width:64px;margin:0;flex:none}
+.tr{display:flex;align-items:center;min-height:42px;cursor:pointer;gap:6px}
+.tr i{display:block;width:20px;align-self:stretch;position:relative;flex:none}
+.tr i.c::before,.tr i.t::before{content:"";position:absolute;left:9px;top:0;bottom:0;border-left:1px solid var(--dim)}
+.tr i.l::before{content:"";position:absolute;left:9px;top:0;height:50%;border-left:1px solid var(--dim)}
+.tr i.t::after,.tr i.l::after{content:"";position:absolute;left:9px;top:50%;width:11px;border-top:1px solid var(--dim)}
+.tr .n{flex:1}
+.bar{height:9px;border:1px solid var(--dim);margin:4px 0}
+.bar i{display:block;height:100%;background:var(--fg)}
+.row{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.row span{flex:1;min-width:130px}
+.dim{color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--bg);border-top:1px solid var(--fg);padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav button{flex:1;border:0;border-right:1px solid var(--dim)}
+#svg{width:100%;height:62vh;display:block;touch-action:none;border:1px solid var(--dim);user-select:none;-webkit-user-select:none}
+#toast{position:fixed;left:8px;right:8px;top:8px;z-index:30;pointer-events:none}
+#toast div{background:var(--bg);border:1px solid var(--fg);padding:8px 10px;margin-bottom:6px}
+#toast .big{font:400 26px/1.1 'VT323',monospace;text-align:center;padding:30px 10px;border-width:2px;margin-top:30vh}
+#sh{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:15}
+#sh .box{position:absolute;left:0;right:0;bottom:0;max-height:86%;overflow:auto;background:var(--bg);border-top:2px solid var(--fg);padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto}
+</style></head><body class="crt">
+<main>
+<div class="v" id="s"></div>
+<div class="v" id="n" style="display:none"><div class="pn"><h1>[СИСТЕМА] ДРЕВО НАВЫКОВ</h1><span class="dim">Тяни одним пальцем, масштабируй двумя. Кнопки «Тело», «Ремесло», «Дом» приближают сектор.</span></div>
+<svg id="svg" viewBox="0 0 660 660"></svg>
+<div class="row"><button onclick="fc(0)">Тело</button><button onclick="fc(1)">Ремесло</button><button onclick="fc(2)">Дом</button><button onclick="zm(.8)">+</button><button onclick="zm(1.25)">−</button><button onclick="zm(0)">Всё</button></div></div>
+<div class="v" id="z" style="display:none"></div>
+<div class="v" id="d" style="display:none"></div>
+</main>
+<div id="sh" onclick="if(event.target==this)closeS()"></div>
+<div id="toast"></div>
+<nav><button data-t="s" onclick="go('s')">Статус</button><button data-t="n" onclick="go('n')">Навыки</button><button data-t="z" onclick="go('z')">Задания</button><button data-t="d" onclick="go('d')">Данные</button></nav>
+<script>
+const RN=['E','D','C','B','A','S'],TH=[0,100,300,700,1500,3000],CAP=120,DAY=864e5;
+const PL=['Изгой','Бродяга','Странник','Следопыт','Наёмник','Ветеран','Страж','Командир','Легенда','Титан'];
+const GR={zd:{n:'Здоровье',c:['hb','ob','vh']},sp:{n:'Спорт',c:['pl','ft','ag']}},KID=['hb','ob','vh','pl','ft','ag'];
+const CL=[['ТЕЛО',['zd','ps','sl','nv','sp']],['РЕМЕСЛО И ДЕНЬГИ',['hm','md','fn','or']],['ДОМ И ЛЮДИ',['hs','ck','dd','pt','fm','ch']]];
+/* задача: [название, единица, XP, направление u/d, минимальный ранг (чертёж)] */
+const G=(n,u,d,nm,c,o)=>{o=o||{};return['ГТО · '+n,u,25,d,o.s||0,0,'',nm,o.sh||0,1,o.t||0,c,o.n||0]};
+const B={
+hb:{n:'Хронические болезни',s:'Хроники',e:'Все плановые визиты за год пройдены',t:[['Самочувствие по хроническому состоянию (1-5)','балл',10],['Плановый визит к специалисту','раз',40],['Приём назначенного лечения','раз',10]]},
+ob:{n:'Органы, анализы и профилактика',s:'Анализы',e:'Полный чекап: зубы, глаза, анализы',t:[['Чекап: визит к врачу','раз',60],['Анализы сданы','раз',40],['Стоматолог','раз',30],['Окулист','раз',30]]},
+vh:{n:'Вредные привычки',s:'Привычки',e:'30 дней без сигарет',t:[['Сигарет за день','шт',10,'d'],['Пиво: порций за день','шт',10,'d']]},
+ps:{n:'Психика',s:'Психика',e:'30 дней ежедневных отметок настроения и энергии',t:[['Настроение','балл',10],['Стресс','балл',10,'d'],['Энергия','балл',10]]},
+sl:{n:'Сон',s:'Сон',e:'14 дней: отбой до 23:00 не меньше 5 из 7 ночей',t:[['Сон за ночь','ч',15],['Бодрость утром','балл',10]]},
+nv:{n:'Питание и вес',s:'Питание',e:'4 недели учёта веса и питания без пропусков',t:[['Вес тела','кг',10,'n'],['Питание по плану','раз',10]]},
+pl:{n:'Пауэрлифтинг',e:'—',L:['Обыватель','Начинающий','III юн.','II юн.','I юн.','III разряд','II разряд','I разряд','КМС','МС','МСМК'],TT:[0,220,255,290,320,350,400,465,515,665,770],t:[['Присед','кг',20,'u',0,0,'4×6–8, пятница'],['Жим лёжа','кг',20,'u',0,0,'4×6–8, среда'],['Становая тяга','кг',20,'u',0,0,'4×5, понедельник']]},
+ft:{n:'Фитнес',e:'Рост рабочих весов в 5 упражнениях за 8 недель',t:[['Жим гантелей на наклонной (гантель)','кг',10,'u',0,1,'3×8–10'],['Тяга горизонтального блока','кг',10,'u',0,1,'3×8–10'],['Подъём на носки в тренажёре','кг',10,'u',0,1,'3×15–20'],['Блок: плечо и кор','мин',10,'u',0,1,'7 мин'],['Болгарский сплит-присед (гантель)','кг',10,'u',0,2,'3×8–10 на ногу'],['Тяга верхнего блока','кг',10,'u',0,2,'3×10–12'],['Махи гантелями в стороны','кг',10,'u',0,2,'3×12–15'],['Блок: плечо и кор','мин',10,'u',0,2,'7 мин'],['Жим в тренажёре сидя','кг',10,'u',0,3,'3×10–12'],['Тяга гантели одной рукой','кг',10,'u',0,3,'3×8–10'],['Сгибания ног в тренажёре','кг',10,'u',0,3,'3×10–12'],['Блок: плечо','мин',10,'u',0,3,'6 мин'],['Румынская тяга','кг',10,'u',0,4,'3×8–10'],['Молот + трицепс в блоке','кг',10,'u',0,4,'3×10–12'],['Махи в наклоне','кг',10,'u',0,4,'3×12–15'],['Блок: плечо и кор','мин',10,'u',0,4,'7 мин'],G('Подтягивание, высокая перекладина','раз','u',[4,8,13],'s',{sh:1}),G('Подтягивание, низкая перекладина 90 см','раз','u',[10,15,23],'s'),G('Отжимания от пола','раз','u',[15,19,33],'s'),G('Рывок гири 16 кг','раз','u',[18,22,40],'s',{sh:1}),G('Поднимание туловища за 1 мин','раз','u',[25,32,42],'v'),G('Бег 3000 м','м:сс','d',[930,870,780],'e',{t:1}),G('Бег 1000 м','м:сс','d',[302,246,225],'e',{t:1}),G('Кросс 5 км','м:сс','d',[1710,1560,1350],'e',{t:1}),G('Лыжи 5 км','м:сс','d',[1770,1590,1380],'e',{t:1}),G('Плавание 50 м','м:сс','d',[82,65,55],'a',{t:1,sh:1}),['Становая тяга','кг',20,'u',0,1,'4×5 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',2],-1],['Жим лёжа','кг',20,'u',0,2,'4×6–8 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',1],-1],['Присед','кг',20,'u',0,3,'4×6–8 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',0],-1]]},
+ag:{n:'Ловкость',e:'Прыжок в длину с места: личный рекорд, подтверждённый видео',t:[['Растяжка','мин',10,'u',0],['Шпагат: расстояние до пола','см',15,'d',0],['Прыжки на месте (контактов)','шт',15,'u',1],['Спрыгивания с тумбы 20–30 см','шт',15,'u',1],['Прыжок в высоту с места','см',30,'u',2],['Прыжок в длину с места','см',30,'u',2],['Прыжки на тумбу','шт',20,'u',2],G('Бег 60 м','с','d',[12.3,10.9,8.8],'r',{t:1,s:1}),G('Наклон вперёд (см от уровня скамьи)','см','u',[3,5,11],'f',{n:1}),G('Прыжок в длину с места','см','u',[197,213,234],'v',{s:2}),G('Метание снаряда 700 г','м','u',[26,30,35],'a',{sh:1}),G('Стрельба 10 м','очки','u',[15,20,25],'a'),G('Туристский поход 10 км+ (навыки)','навыков','u',[3,5,7],'a')]},
+hm:{n:'Хендимен',e:'Первый платный заказ',t:[['Изучение навыка','мин',15],['Практика с фото','шт',25],['Платный заказ','заказ',80,'u',1]]},
+md:{n:'Медийка',e:'12 публикаций за 6 недель',t:[['Шаг по контенту','мин',15],['Публикация','шт',30],['Монтаж ролика','мин',25,'u',1]]},
+fn:{n:'Финансы',e:'Первый доход от своего дела',t:[['Учёт расходов','раз',10],['Недельный обзор денег','раз',25],['Доход','тыс ₸',50,'u',1]]},
+or:{n:'Ораторское',e:'Реальное выступление или переговоры',t:[['Тренировка речи','мин',15],['Разбор записи','раз',25],['Выступление или переговоры','раз',70,'u',1]]},
+hs:{n:'Домохозяин',e:'4 недели по системе без срывов',t:[['Уборка зоны','мин',10],['Меню на неделю','раз',20],['Ремонт в доме','шт',50,'u',1]]},
+ck:{n:'Повар',e:'10 новых блюд',t:[['Готовка','раз',10],['Новое блюдо','шт',25],['Заготовки на 2 дня','раз',30,'u',1]]},
+dd:{n:'Папа',e:'Ритуал с каждым ребёнком 8 недель',t:[['Время с детьми без телефона','мин',15],['Контакт с дочерью в Москве','раз',15],['Ритуал с ребёнком','раз',40,'u',1]]},
+pt:{n:'Партнёр',e:'4 свидания за месяц',t:[['Время вдвоём без телефона','мин',15],['Разговор по душам','раз',20],['Свидание','раз',50,'u',1]]},
+fm:{n:'Семья',e:'Годовой план по каждому ребёнку',t:[['Разбор плана по детям','раз',25],['Воспитательный урок','раз',25],['Годовой план ребёнка','шт',70,'u',1]]},
+ch:{n:'Харизма',e:'8 встреч за 2 месяца',t:[['Встреча вне семьи','раз',25],['Новое знакомство','раз',25],['Организовал встречу','раз',50,'u',1]]}
+};
+const $=id=>document.getElementById(id),SV=$('svg'),SH=$('sh'),TO=$('toast');
+const day=d=>(d||new Date()).toLocaleDateString('sv'),sum=(a,k)=>Math.round(a.reduce((s,e)=>s+e[k],0)*10)/10;
+const K='sll1';let st=null,tab='s',cur='',un={},P='w',vb=[0,0,660,660],drag=null,moved=0,rs=0;
+try{st=JSON.parse(localStorage.getItem(K))}catch(e){}
+const fresh=()=>({v2:1,log:[],r:{},ex:[],pin:'',foc:[],fw:'',streak:0,last:'',fz:{m:'',n:2},sick:{},th:'',crt:1,del:[],rst:0,ts:0});
+/* Приводит данные (из импорта или с сервера) к ожидаемым типам, чтобы чужой текст не попал в разметку */
+const num=v=>{v=+v;return isFinite(v)?v:0};
+function clean(o){const s=Object.assign(fresh(),o&&typeof o=='object'?o:{});
+ const ce=e=>{const r={t:num(e.t),b:String(e.b),i:num(e.i)|0,v:num(e.v),x:num(e.x)};if(e.rp!=null)r.rp=num(e.rp);if(Array.isArray(e.sets))r.sets=e.sets.filter(Array.isArray).slice(0,15).map(q=>[num(q[0]),num(q[1])]);if(e.m!=null)r.m=num(e.m);if(e.demo)r.demo=1;return r};
+ s.log=(Array.isArray(s.log)?s.log:[]).filter(e=>e&&B[e.b]&&B[e.b].t[num(e.i)|0]).map(ce);
+ s.ex=(Array.isArray(s.ex)?s.ex:[]).filter(e=>e&&B[e.b]).map(e=>({t:num(e.t),b:String(e.b),r:num(e.r),p:String(e.p||'').slice(0,500)}));
+ s.r=Object.fromEntries(Object.entries(s.r||{}).filter(([k])=>B[k]).map(([k,v])=>[k,Math.max(0,Math.min(5,num(v)|0))]));
+ s.foc=(Array.isArray(s.foc)?s.foc:[]).filter(b=>B[b]).slice(0,3);
+ s.del=(Array.isArray(s.del)?s.del:[]).map(num);s.rst=num(s.rst);s.ts=num(s.ts);s.streak=num(s.streak)|0;
+ s.last=/^\d{4}-\d\d-\d\d$/.test(s.last)?s.last:'';s.fw=String(s.fw||'');
+ s.fz={m:String((s.fz||{}).m||''),n:Math.max(0,Math.min(2,num((s.fz||{}).n)))};
+ s.sick=Object.fromEntries(Object.keys(s.sick||{}).filter(k=>/^\d{4}-\d\d-\d\d$/.test(k)).map(k=>[k,1]));
+ if(s.bw!=null)s.bw=num(s.bw)||83;if(s.base)s.base={0:num(s.base[0]),1:num(s.base[1]),2:num(s.base[2])};
+ if(s.off!=null)s.off=num(s.off)|0;if(!['','dark','light'].includes(s.th))s.th='';if(!['a','c','m'].includes(s.vm))delete s.vm;
+ ['pin','pinh'].forEach(k=>{if(s[k]!=null&&typeof s[k]!='string')delete s[k]});
+ return s}
+if(!st||!Array.isArray(st.log))st=fresh();if(!st.v2){try{localStorage.setItem(K+'_bak',JSON.stringify(st))}catch(e){}const M={0:['sl',0],1:['vh',0],2:['ob',0]};st.log.forEach(e=>{if(e.b=='hp'){const m=M[e.i];if(m){e.b=m[0];e.i=m[1]}else e.b='ob'}});(st.ex||[]).forEach(e=>{if(e.b=='hp')e.b='ob'});if(st.r&&st.r.hp!=null){st.r.ob=Math.max(st.r.ob||0,st.r.hp);delete st.r.hp}st.v2=1;try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}}st=clean(st);
+const saveLocal=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
+const save=()=>{st.ts=Date.now();saveLocal();schedPush()};
+/* Удаляет записи так, чтобы они не вернулись при синхронизации с другого устройства */
+const drop=pred=>{st.log.forEach(e=>{if(pred(e))st.del.push(e.t)});st.log=st.log.filter(e=>!pred(e));st.ex.forEach(e=>{if(pred(e))st.del.push(e.t)});st.ex=st.ex.filter(e=>!pred(e))};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const wk=()=>{const d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));return day(d)};
+if(st.fw!=wk()){st.fw=wk();st.foc=[]}
+if(st.th)document.documentElement.dataset.theme=st.th;
+document.body.classList.toggle('crt',!!st.crt);
+const e1=e=>e.rp>1?e.v*(1+e.rp/30):e.v,best=i=>Math.round(Math.max((st.base||{})[i]||0,...st.log.filter(e=>e.b=='pl'&&e.i==i).map(e1))*2)/2,plTot=()=>best(0)+best(1)+best(2),plLv=()=>{let r=0;B.pl.TT.forEach((q,k)=>{if(plTot()>=q)r=k});return r};
+const rk=b=>b=='pl'?plLv():(st.r[b]||0),xpOf=b=>st.log.reduce((a,e)=>e.b==b?a+e.x:a,0),tot=()=>st.log.reduce((a,e)=>a+e.x,0);
+const topR=b=>(B[b].L||RN).length-1,rn=(b,r)=>(B[b].L||RN)[r],DN=['','ДЕНЬ 1 · ПН · ТЯГА','ДЕНЬ 2 · СР · ЖИМ','ДЕНЬ 3 · ПТ · ПРИСЕД','ДЕНЬ 4 · ВС · ЛЁГКИЙ'],pd=()=>({1:1,3:2,5:3,0:4})[new Date().getDay()]||0;
+const prog=b=>{const r=rk(b);if(r>=topR(b))return 100;if(b=='pl'){const T=B.pl.TT;return(plTot()-T[r])/(T[r+1]-T[r])*100}return(xpOf(b)-TH[r])/(TH[r+1]-TH[r])*100};
+const BW=()=>st.bw||83,wks=()=>{const a=st.log.filter(e=>e.b=='pl'||e.b=='ft').map(e=>e.t);return a.length?Math.floor((Date.now()-Math.min(...a))/(7*DAY)):0};
+const agC=()=>[['Не меньше 8 недель записей в базе (сейчас '+wks()+')',wks()>=8],['Разрешение уролога (отметка ниже)',!!st.doc],['Присед не меньше 1,25 веса тела: '+Math.ceil(BW()*1.25)+' кг (сейчас '+best(0)+')',best(0)>=BW()*1.25]],agS=()=>agC().every(q=>q[1])?(best(0)>=BW()*1.5&&st.leg?2:1):0;
+const lvl=()=>Math.floor(Math.sqrt(tot()/40))+1,nm=b=>lk(b)?'ЗАСЕКРЕЧЕНО':B[b].n;
+const gap=()=>st.last?Math.round((new Date(day())-new Date(st.last))/DAY):99;
+const fzLeft=()=>{const m=day().slice(0,7);if(st.fz.m!=m)st.fz={m,n:2};return st.fz.n};
+const shown=()=>gap()>2?0:st.streak;
+const yday=()=>{const d=new Date();d.setDate(d.getDate()-1);return day(d)};
+function toast(m,big){const d=document.createElement('div');d.textContent=m;if(big)d.className='big';TO.appendChild(d);setTimeout(()=>d.remove(),big?3200:2400)}
+function go(t){tab=t;render()}
+function render(){if(st.fw!=wk()){st.fw=wk();st.foc=[]}document.querySelectorAll('.v').forEach(v=>v.style.display='none');$(tab).style.display='block';
+ if(tab=='s')vS();if(tab=='n')vK();if(tab=='z')vZ();if(tab=='d')vD();
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
+function act(){const g=gap();if(g==0)return;st.streak=g==1?st.streak+1:1;st.last=day()}
+function capUsed(b){const d=day();return st.log.reduce((a,e)=>e.b==b&&day(new Date(e.t))==d?a+e.x:a,0)}
+function add(b,i,v,rp,sets){if(!sets&&!(v>0)&&!(B[b].t[i][12]&&isFinite(v)))return toast('> ВВЕДИ РЕЗУЛЬТАТ');if(B[b].t[i][1]=='балл'&&(v<1||v>5))return toast('> ШКАЛА 1-5');if(b=='nv'&&i==0&&v>=30&&v<=300)st.bw=v;if(b=='pl'&&(!(rp>=1&&rp<=10)||v<20||v>400))return toast('> ПОВТОРЫ 1-10, ВЕС 20-400 КГ');
+ const T=B[b].t[i];let x=T[2]*(st.foc.includes(b)?2:1);x=Math.max(0,Math.min(x,CAP-capUsed(b)));const L0=lvl();
+ if(sets)twRoll();st.log.push({t:Date.now(),b,i,v,x,rp,sets});mir(b,i);act();save();
+ toast('> ЗАДАНИЕ ВЫПОЛНЕНО. +'+x+' XP'+(x?'':' (ЛИМИТ ДНЯ)'));
+ if(lvl()>L0)toast('> УРОВЕНЬ ПОВЫШЕН: '+lvl(),1);
+ if(SH.style.display=='block'&&cur){const bx=SH.firstElementChild,sc=bx?bx.scrollTop:0;openB(cur);if(SH.firstElementChild)SH.firstElementChild.scrollTop=sc}render()}
+/* Заморозка и больной день закрывают пропущенный ВЧЕРАШНИЙ день: серия сохраняется, а сегодняшняя запись продолжит её */
+function covers(sick){const g=gap();if(g==0)return toast('> СЕГОДНЯ УЖЕ ЗАСЧИТАНО');if(g==1)return toast('> ВЧЕРА ЗАСЧИТАНО. СЕГОДНЯ ЕЩЁ МОЖНО УСПЕТЬ');if(g>2)return toast('> СЕРИЯ УЖЕ ПОТЕРЯНА');
+ if(sick)st.sick[yday()]=1;else{if(fzLeft()<1)return toast('> ЗАМОРОЗОК НЕТ');st.fz.n--}
+ st.last=yday();save();toast(sick?'> БОЛЬНОЙ ДЕНЬ ЗАПИСАН. СЕРИЯ СОХРАНЕНА':'> СЕРИЯ ЗАМОРОЖЕНА');render()}
+/* СТАТУС */
+function vS(){const L=lvl(),t=tot(),a=40*(L-1)**2,n=40*L*L,ks=Object.keys(B),avg=ks.reduce((s,b)=>s+rk(b)*5/topR(b),0)/ks.length;
+ let h=`<div class="pn"><h1>[СИСТЕМА] СТАТУС</h1>УРОВЕНЬ ${L} · ${PL[Math.min(9,Math.floor((L-1)/2))]}
+ <div class="bar"><i style="width:${(t-a)/(n-a)*100}%"></i></div>${t} из ${n} XP<br>Сводный ранг: ${RN[Math.round(avg)]} · Серия: ${shown()} дн. · Заморозок: ${fzLeft()}${gap()==2&&st.streak?'<br><b style="color:var(--amb)">> ВЧЕРА ПРОПУЩЕНО. Закрой день заморозкой или больным днём до первой записи сегодня, иначе серия начнётся заново.</b>':''}
+ ${gap()==2&&st.streak?'<div class="row" style="margin-top:8px"><button onclick="covers(0)">Заморозка</button><button onclick="covers(1)">Больной день</button></div>':''}</div><div class="pn"><b>ВЕТКИ</b>${Object.keys(GR).map(g=>`<div class="row" onclick="openG('${g}')"><span>[${gRank(g)}] ${GR[g].n.toUpperCase()} (группа)<div class="bar"><i style="width:${gPct(g)}%"></i></div></span><span class="dim" style="flex:0;min-width:70px">${gXP(g)} XP</span></div>`).join('')}`;
+ ks.forEach(b=>{const r=rk(b),x=xpOf(b),p=prog(b);
+  h+=`<div class="row" onclick="openB('${b}')"><span>[${rn(b,r)}] ${KID.includes(b)?'· ':''}${nm(b)}<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div></span><span class="dim" style="flex:0;min-width:70px">${x} XP</span></div>`});
+ h+=`</div><div class="row"><button onclick="th()">Тема</button><button onclick="crt()">Эффект ЭЛТ</button><button onclick="un={};toast('> ЗАКРЫТЫЕ ВЕТКИ ЗАБЛОКИРОВАНЫ');render()">Заблокировать</button></div>`;$('s').innerHTML=h}
+function th(){const c=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');st.th=c=='dark'?'light':'dark';document.documentElement.dataset.theme=st.th;save()}
+function crt(){st.crt=st.crt?0:1;document.body.classList.toggle('crt',!!st.crt);save()}
+/* ДРЕВО */
+let vi=0,pd0=0;const pts=new Map();
+function sv(){const w=vb[2];vb[3]=w*SV.clientHeight/Math.max(1,SV.clientWidth);const cx=Math.max(0,Math.min(660,vb[0]+w/2)),cy=Math.max(0,Math.min(660,vb[1]+vb[3]/2));vb[0]=cx-w/2;vb[1]=cy-vb[3]/2;SV.setAttribute('viewBox',vb.join(' '))}
+const ctr=(cx,cy,w)=>{vb=[cx-w/2,cy-w*SV.clientHeight/Math.max(1,SV.clientWidth)/2,w,0];sv()},pinD=()=>{const a=[...pts.values()];return a.length==2?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0};
+addEventListener('resize',()=>{if(vi)sv()});
+SV.addEventListener('wheel',e=>{e.preventDefault();zm(e.deltaY>0?1.15:.87)},{passive:false});
+function zm(f){if(!f)return ctr(330,330,700);ctr(vb[0]+vb[2]/2,vb[1]+vb[3]/2,Math.max(160,Math.min(900,vb[2]*f)))}
+const fc=i=>ctr([330,477,183][i],[160,415,415][i],400);
+SV.onpointerdown=e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=0;pd0=pinD()};
+SV.onpointermove=e=>{const p=pts.get(e.pointerId);if(!p)return;const k=vb[2]/SV.clientWidth,r=SV.getBoundingClientRect();
+ if(pts.size==2){p.x=e.clientX;p.y=e.clientY;const n=pinD(),a=[...pts.values()];if(pd0&&n){const mx=(a[0].x+a[1].x)/2-r.left,my=(a[0].y+a[1].y)/2-r.top,w=Math.max(160,Math.min(900,vb[2]*pd0/n)),k2=w/SV.clientWidth;vb[0]+=mx*(k-k2);vb[1]+=my*(k-k2);vb[2]=w;pd0=n;moved=1;sv()}return}
+ const dx=e.clientX-p.x,dy=e.clientY-p.y;if(Math.abs(dx)+Math.abs(dy)>4)moved=1;if(moved){vb[0]-=dx*k;vb[1]-=dy*k;p.x=e.clientX;p.y=e.clientY;sv()}};
+SV.onpointerup=SV.onpointercancel=SV.onpointerleave=e=>{pts.delete(e.pointerId);pd0=0;setTimeout(()=>moved=0,80)};
+SV.onclick=e=>{if(moved)return;const g=e.target.closest('[data-b]');if(g)openB(g.dataset.b);else if(e.target.closest('[data-g]'))toggleG(e.target.closest('[data-g]').dataset.g);else if(e.target.closest('[data-s]'))toast('> СВОБОДНЫЙ СЛОТ. Новые ветки появятся в следующей версии.')};
+/* ВЕТКА */
+function closeS(){SH.style.display='none';cur=''}
+function openB(b){cur=b;const o=B[b];
+ if(lk(b)){pinSheet(b);return}
+ if(b=='pl')return openPL();const r=rk(b),x=xpOf(b),nx=TH[r+1],p=r==5?100:(x-TH[r])/(nx-TH[r])*100;
+ let h=`<div class="box"><h2>[${RN[r]}${r==5&&x>=3000?'+'+Math.floor((x-3000)/2000):''}] ${o.n}${st.foc.includes(b)?' · ФОКУС x2':''}</h2><div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>${x} XP${r<5?' из '+nx:''}`;
+ h+=b=='ag'?agPanel():b=='ft'?weekPanel()+ftPanel():b=='hb'?hbPanel():'';let gd=0,gh=0;(b=='ft'?ordFt():o.t.map((x,k)=>k)).forEach(i=>{const T=o.t[i];if(T[5]&&T[5]!=gd){gd=T[5];h+='<b>'+DN[gd]+(gd==pd()?' · СЕГОДНЯ':'')+'</b>'}if(T[9]&&!gh){gh=1;h+='<b>ГТО · 10 СТУПЕНЬ, 30-34 ГОДА</b>'}if((b=='ag'?(T[4]||0)>agS():(T[4]||0)>r)||(T[8]&&!st.ortho))h+=`<div class="row dim"><span>ЧЕРТЁЖ: ${T[0]}</span>${T[8]&&!st.ortho?'нужна отметка: ортопед разрешил':b=='ag'?'откроется на этапе '+T[4]:'откроется с ранга '+RN[T[4]]}</div>`;
+  else if(b=='ft'&&!T[9])h+=setRow(b,i,T);else h+=`<div class="row"><span>${T[0]}${T[6]?' <span class="dim">'+T[6]+'</span>':''}${T[3]=='d'?' (меньше лучше)':''}${T[7]?gl(b,i,T):''}</span><input id="v${i}" type="${T[10]||T[12]?'text':'number'}" inputmode="decimal" placeholder="${T[1]}"><button onclick="add('${b}',${i},pv($('v${i}').value))">+${T[2]}</button></div>`});
+ if(r<5){h+=`<div class="pn"><b>ЭКЗАМЕН на ранг ${RN[r+1]}</b><br>${o.e}<br>`;
+  h+=x>=nx?`<input id="pf" placeholder="доказательство: ссылка или описание" style="width:100%;margin:6px 0"><button onclick="exam()">Сдать экзамен</button>`:`<span class="dim">Нужно ещё ${nx-x} XP.</span>`;h+='</div>'}
+ else h+=`<p>> МАКСИМАЛЬНЫЙ РАНГ. Дальше идёт престиж: +1 за каждые 2000 XP.</p>`;
+ SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
+function exam(){const v=$('pf').value.trim();if(v.length<5)return toast('> ОПИШИ ДОКАЗАТЕЛЬСТВО (минимум 5 символов)');
+ st.r[cur]=rk(cur)+1;st.ex.push({t:Date.now(),b:cur,r:st.r[cur],p:v});save();toast('> РАНГ ПОВЫШЕН: '+B[cur].n+' → '+RN[st.r[cur]],1);openB(cur);render()}
+/* НАВИГАЦИЯ */
+const lf=b=>(rk(b)+(rk(b)<topR(b)?Math.max(0,Math.min(1,prog(b)/100)):0))*5/topR(b);
+const cF=it=>{const lv=it.flatMap(id=>GR[id]?GR[id].c:[id]);return lv.reduce((s,b)=>s+lf(b),0)/lv.length};
+function tg(k){st.op=st.op||{};st.op[k]=!st.op[k];save();vK()}
+function vK(){let L=$('lst');if(!L){L=document.createElement('div');L.id='lst';$('n').insertBefore(L,$('n').firstChild)}
+ const m=st.vm||'a',mp=m=='m';
+ L.nextElementSibling.style.display=mp?'':'none';SV.style.display=mp?'':'none';SV.nextElementSibling.style.display=mp?'':'none';
+ L.innerHTML=`<div class="row">`+[['a','Список'],['c','Схема'],['m','Карта']].map(([k,t])=>`<button class="${m==k?'on':''}" onclick="st.vm='${k}';save();vK()">${t}</button>`).join('')+`</div>`+(m=='a'?listA():m=='c'?listC():'');
+ if(mp)vN()}
+function listA(){const op=st.op=st.op||{'ТЕЛО':1},bar=p=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`,
+ rwB=(b,d)=>`<div class="rw" style="padding-left:${6+d*16}px" onclick="openB('${b}')"><span>·</span><span class="n">${nm(b)}</span><span class="dim">[${rn(b,rk(b))}]</span>${bar(prog(b))}</div>`;
+ let h='';
+ CL.forEach(([cn,it],ci)=>{const F=cF(it),o=op[cn];
+  h+=`<div class="rw" style="color:var(--c${ci});font-weight:bold" onclick="tg('${cn}')"><span>${o?'▾':'▸'}</span><span class="n">${cn}</span><span>[${RN[Math.min(5,Math.floor(F))]}]</span>${bar((F%1)*100)}</div>`;
+  if(o)it.forEach(id=>{if(GR[id]){const go=op[id];h+=`<div class="rw" style="padding-left:22px" onclick="tg('${id}')"><span>${go?'▾':'▸'}</span><span class="n">${GR[id].n}</span><span class="dim">[${gRank(id)}]</span>${bar(gPct(id))}</div>`;if(go)GR[id].c.forEach(b=>h+=rwB(b,2))}else h+=rwB(id,1)})});
+ return h+`<p class="dim">Нажми на раздел, чтобы раскрыть. Нажми на ветку, чтобы открыть её.</p>`}
+function listC(){const row=(p,txt,r,fn,col,b)=>`<div class="tr" onclick="${fn}" style="${col?'color:'+col:''}">${p.map(c=>`<i class="${c}"></i>`).join('')}<span class="n" style="${b?'font-weight:bold':''}">${txt}</span><span class="dim">[${r}]</span></div>`;
+ let h=`<div class="tr"><span class="n"><b>ГЕРОЙ · УР. ${lvl()}</b></span><span class="dim">серия ${shown()} дн.</span></div>`;
+ const kids=(items,p0)=>{let s='';items.forEach((id,j)=>{const last=j==items.length-1,c1=last?'l':'t',cn=last?'':'c';
+  if(GR[id]){s+=row([...p0,c1],GR[id].n,gRank(id),`openG('${id}')`,'',0);GR[id].c.forEach((b,k)=>{s+=row([...p0,cn,k==GR[id].c.length-1?'l':'t'],tl(b),rn(b,rk(b)),`openB('${b}')`,'',0)})}
+  else s+=row([...p0,c1],tl(id),rn(id,rk(id)),`openB('${id}')`,'',0)});return s};
+ CL.forEach(([cn,it],ci)=>{const lc=ci==CL.length-1;h+=row([lc?'l':'t'],cn,RN[Math.min(5,Math.floor(cF(it)))],'','var(--c'+ci+')',1)+kids(it,[lc?'':'c'])});
+ return h+`<p class="dim">Схема показывает всё дерево целиком. Нажми на ветку, чтобы открыть, на группу — чтобы увидеть сводку.</p>`}
+/* НЕДЕЛЯ ТРЕНИРОВОК */
+const twS=()=>{if(st.twS==null){const d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));d.setHours(0,0,0,0);st.twS=d.getTime()}return st.twS};
+const dn=t=>new Date(t).toLocaleDateString('ru',{weekday:'short',day:'numeric',month:'numeric'});
+const wkS=(b,i)=>{const s=twS(),A=st.log.filter(e=>e.b==b&&e.i==i&&e.sets),C=A.filter(e=>e.t>=s),pe=A.filter(e=>e.t<s).pop(),f=e=>e.sets.map(x=>x[0]+'×'+x[1]).join(', ');
+ return (C.length?'<br><b>Эта неделя</b>'+C.map(e=>'<br>'+dn(e.t)+': '+f(e)).join(''):'')+(pe?`<br><span class="dim">Прошлая неделя (${dn(pe.t)}): ${f(pe)}</span>`:'')};
+const weekPanel=()=>{const s=twS(),n=new Set(st.log.filter(e=>e.b=='ft'&&!e.m&&e.t>=s&&B.ft.t[e.i][5]).map(e=>B.ft.t[e.i][5])).size;return `<div class="pn"><b>НЕДЕЛЯ ТРЕНИРОВОК</b> с ${dn(s)}<br>Дней программы с записями: ${n} из 4. Записи недели остаются на экране, пока неделя не завершена.<div class="row"><button onclick="twEnd()">Завершить неделю</button></div></div>`};
+function twEnd(){st.twP=twS();st.twS=Date.now();save();toast('> НЕДЕЛЯ ЗАВЕРШЕНА. ЗАПИСИ В ЖУРНАЛЕ');openB('ft')}
+function twRoll(){const s=twS(),now=Date.now(),A=st.log.filter(e=>e.b=='ft'&&!e.m&&e.t>=s&&B.ft.t[e.i][5]),n=new Set(A.map(e=>B.ft.t[e.i][5])).size,ld=A.length?day(new Date(A[A.length-1].t)):'';
+ if(now-s>7*DAY||(n>=4&&ld&&day(new Date(now))>ld)){st.twP=s;st.twS=now;toast('> НОВАЯ НЕДЕЛЯ ТРЕНИРОВОК')}}
+/* СВЯЗИ */
+const ordFt=()=>B.ft.t.map((T,i)=>i).sort((a,b)=>{const A=B.ft.t[a],C=B.ft.t[b];return((A[5]||9)*10+(A[14]||0))-((C[5]||9)*10+(C[14]||0))||a-b});
+function mir(b,i){const L=B[b].t[i][13],e=st.log[st.log.length-1];if(!L||!e.sets)return;const m=s=>s[0]*(s[1]>1?1+s[1]/30:1),p=e.sets.filter(s=>s[1]<=10&&s[0]>=20),bs=p.reduce((q,s)=>!q||m(s)>m(q)?s:q,null);if(bs){st.log.push({t:e.t+1,b:L[0],i:L[1],v:bs[0],rp:bs[1],sets:e.sets,x:0,m:e.t});toast('> ТАКЖЕ ЗАПИСАНО: '+B[L[0]].n.toUpperCase())}}
+/* PIN */
+const LKG={pt:'pin',hb:'pinh',ob:'pinh',ps:'pinh'},lk=b=>!!LKG[b]&&!un[LKG[b]];
+let pf=0,pu=0,rs2=0;
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const h256=async s=>hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sll:'+s)));
+/* PIN хранится как PBKDF2 (200 000 итераций, случайная соль): так его дольше подбирать, если кто-то достанет копию данных */
+const kdf=async(pin,salt)=>{const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:new TextEncoder().encode(salt),iterations:200000},k,256))};
+const pinMake=async pin=>{const salt=hex(crypto.getRandomValues(new Uint8Array(16)));return 'p2$'+salt+'$'+await kdf(pin,salt)};
+const pinCheck=async(stored,pin)=>{if(stored.startsWith('p2$')){const[,salt,h]=stored.split('$');return await kdf(pin,salt)==h}return stored==await h256(pin)||stored==pin};
+function pinSheet(b){const k=LKG[b],g=k=='pin'?'«Партнёр»':'здоровье и психика';
+ SH.innerHTML=`<div class="box"><h2>ЗАСЕКРЕЧЕНО</h2><p>${st[k]?'Введи PIN: '+g+'.':'Задай PIN (4-8 цифр) для раздела: '+g+'. Повтори его во втором поле.'}</p><input id="pinv" type="password" inputmode="numeric" maxlength="8">${st[k]?'':' <input id="pinv2" type="password" inputmode="numeric" maxlength="8">'} <button onclick="pinGo('${b}')">ОК</button> <button onclick="closeS()">Закрыть</button><p class="dim">Это замок экрана: данные хранятся в браузере устройства и не шифруются. Выход из приложения блокирует ветку снова.</p>${st[k]?`<button id="fg" onclick="pinForgot('${b}')">Забыл PIN</button>`:''}</div>`;SH.style.display='block'}
+async function pinGo(b){const k=LKG[b],v=$('pinv').value.trim();
+ if(!/^\d{4,8}$/.test(v))return toast('> PIN: 4-8 ЦИФР');
+ if(Date.now()<pu)return toast('> СЛИШКОМ МНОГО ПОПЫТОК. ПОДОЖДИ МИНУТУ');
+ if(!st[k]&&$('pinv2').value.trim()!=v)return toast('> PIN НЕ СОВПАДАЕТ');
+ if(!st[k])st[k]=await pinMake(v);else if(!await pinCheck(st[k],v)){pf++;if(pf>=5){pu=Date.now()+60000;pf=0}return toast('> НЕВЕРНЫЙ PIN')}else if(!st[k].startsWith('p2$'))st[k]=await pinMake(v);
+ pf=0;un[k]=true;save();toast('> ДОСТУП ОТКРЫТ');openB(b);render()}
+function pinForgot(b){const k=LKG[b],e=$('fg');if(!rs2){rs2=1;e.textContent='Точно? Данные сотрутся';setTimeout(()=>{rs2=0;if($('fg'))$('fg').textContent='Забыл PIN'},3000);return}
+ rs2=0;drop(x=>LKG[x.b]==k);st[k]='';delete un[k];save();toast('> PIN СБРОШЕН, ДАННЫЕ ЗАКРЫТЫХ ВЕТОК СТЁРТЫ');closeS();render()}
+/* При сворачивании закрываем открытую секретную ветку и перерисовываем экран, чтобы данные не остались видны */
+document.addEventListener('visibilitychange',()=>{if(document.hidden){un={};if(cur&&LKG[cur])closeS();render()}else pull()});
+/* ГРУППЫ НА КАРТЕ */
+let gx='';
+const tl=b=>lk(b)?'ЗАСЕКРЕЧЕНО':(B[b].s||B[b].n);
+const gF=g=>GR[g].c.reduce((s,b)=>s+(rk(b)+(rk(b)<topR(b)?Math.max(0,Math.min(1,prog(b)/100)):0))*5/topR(b),0)/GR[g].c.length,gRank=g=>RN[Math.min(5,Math.floor(gF(g)))],gPct=g=>(gF(g)%1)*100,gXP=g=>GR[g].c.reduce((a,b)=>a+xpOf(b),0);
+const hbPanel=()=>`<div class="pn"><b>РЕЕСТР ДОПУСКОВ</b><br><span class="dim">Отметки врачей: из них берут данные другие ветки. Это учёт, а не медицинская рекомендация.</span><div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('hb')">Уролог разрешил</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('hb')">Ортопед разрешил</button></div></div>`;
+function brSVG(b,a,col,s0,pr,lr,fs){const ca=Math.cos(a),sa=Math.sin(a),r0=rk(b),NN=topR(b)+1,sg=(240-s0)/(NN-1);let s=`<g data-b="${b}" style="color:${col};cursor:pointer">`;
+ for(let k=0;k<NN;k++){const x=330+ca*(s0+sg*k),y=330+sa*(s0+sg*k),on=k<=r0,nx=k==r0+1;
+  s+=`<line x1="${pr[0]}" y1="${pr[1]}" x2="${x}" y2="${y}" stroke="currentColor" stroke-width="${on?2.5:1}" opacity="${on?1:.3}"/><rect x="${x-8}" y="${y-8}" width="16" height="16" transform="rotate(45 ${x} ${y})" fill="${on?'currentColor':'var(--bg)'}" stroke="currentColor" opacity="${on||nx?1:.35}"${nx?' class="pu"':''}/>`;pr=[x,y]}
+ return s+`<text x="${330+ca*lr}" y="${330+sa*lr}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" fill="currentColor" stroke="none">${tl(b)}</text></g>`}
+function gNode(g,a,col){const ca=Math.cos(a),sa=Math.sin(a),px=330+ca*76,py=330+sa*76,o=gx==g,c=GR[g].c,lx=o?px+22:330+ca*112,ly=o?py-16:330+sa*112;
+ let s=`<g data-g="${g}" style="color:${col};cursor:pointer"><line x1="330" y1="330" x2="${px}" y2="${py}" stroke="currentColor" stroke-width="2.5"/><rect x="${px-13}" y="${py-13}" width="26" height="26" transform="rotate(45 ${px} ${py})" fill="var(--bg)" stroke="currentColor" stroke-width="2"/><text x="${px}" y="${py}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="currentColor" stroke="none">${gRank(g)}</text><text x="${lx}" y="${ly}" text-anchor="${o?'start':'middle'}" font-size="13" fill="currentColor" stroke="none">${GR[g].n}${o?'':' +'}</text></g>`;
+ if(o)c.forEach((b,k)=>{s+=brSVG(b,a+(k-(c.length-1)/2)*14*Math.PI/180,col,108,[px,py],270+(k%2)*24,12)});return s}
+function vN(){let s='';
+ CL.forEach(([cn,it],ci)=>{const cc=[-90,30,150][ci],col='var(--c'+ci+')',n=it.length;
+  it.forEach((id,j)=>{const a=(cc+(n>1?(j-(n-1)/2)*100/(n-1):0))*Math.PI/180;s+=GR[id]?gNode(id,a,col):brSVG(id,a,col,70,[330,330],278,14)});
+  const a=(cc+60)*Math.PI/180;s+=`<g data-s="1" style="color:${col};cursor:pointer"><circle cx="${330+Math.cos(a)*150}" cy="${330+Math.sin(a)*150}" r="14" fill="none" stroke="currentColor" stroke-dasharray="3 3"/><text x="${330+Math.cos(a)*150}" y="${330+Math.sin(a)*150}" text-anchor="middle" dominant-baseline="middle" fill="currentColor" stroke="none">+</text></g>`});
+ s+=`<circle cx="330" cy="330" r="46" fill="var(--bg)" stroke="var(--fg)" stroke-width="2"/><text x="330" y="326" text-anchor="middle" font-size="16" fill="var(--fg)" stroke="none">УР. ${lvl()}</text><text x="330" y="344" text-anchor="middle" font-size="12" fill="var(--fg)" stroke="none">${shown()} дн.</text>`;
+ SV.innerHTML=s;if(vi)sv();else{vi=1;zm(0)}}
+function toggleG(g){gx=gx==g?'':g;vN();if(gx){let a=0;CL.forEach(([cn,it],ci)=>{const j=it.indexOf(g);if(j>=0){const n=it.length;a=([-90,30,150][ci]+(n>1?(j-(n-1)/2)*100/(n-1):0))*Math.PI/180}});ctr(330+Math.cos(a)*170,330+Math.sin(a)*170,430)}}
+function openG(g){if(g=='sp')return openSport();cur='';const c=GR[g].c;let h=`<div class="box"><h2>[${gRank(g)}] ${GR[g].n}</h2>Общий XP: ${gXP(g)}. Ранг: средний по подветкам.<div class="bar"><i style="width:${gPct(g)}%"></i></div>`;
+ c.forEach(b=>{const r=rk(b);h+=`<div class="row"><span>[${rn(b,r)}] ${nm(b)}<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog(b)))}%"></i></div></span><button onclick="openB('${b}')">Открыть</button></div>`});
+ SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
+/* ПОДХОДЫ */
+const SS={},sk=(b,i)=>b+i,agg=(a,T)=>T[5]||T[1]=='кг'?Math.max(0,...a.map(e=>e.v)):sum(a,'v');
+const sum2=a=>{const v=Math.round(a.reduce((s,x)=>s+x[0]*x[1],0)),m=a.reduce((p,x)=>x[0]>p[0]?x:p,a[0]);return a.length+' подх. · объём '+v+' кг · макс '+m[0]+'×'+m[1]};
+const lastS=(b,i)=>{const e=[...st.log].reverse().find(e=>e.b==b&&e.i==i&&e.sets);return e?`<br><span class="dim">Прошлый раз (${day(new Date(e.t)).slice(5)}): ${e.sets.map(s=>s[0]+'×'+s[1]).join(', ')}</span>`:''};
+const setRow=(b,i,T)=>`<div class="pn"><b>${T[0]}</b> <span class="dim">${T[6]||''}</span>${wkS(b,i)}<div id="sb${sk(b,i)}">${sbHTML(b,i)}</div></div>`;
+function sbHTML(b,i){const k=sk(b,i),a=SS[k]||[],l=a[a.length-1]||[b=='pl'?'':0,''];
+ let h=a.map((s,j)=>`<div class="row"><span>${j+1}) ${s[0]} × ${s[1]}</span><button onclick="sd('${b}',${i},${j})">×</button></div>`).join('');
+ h+=`<div class="row"><input id="w${k}" type="number" inputmode="decimal" placeholder="вес" value="${l[0]}"><input id="n${k}" type="number" inputmode="numeric" placeholder="повт" value="${l[1]}" style="width:64px"><input id="c${k}" type="number" inputmode="numeric" placeholder="подх" value="1" style="width:64px"><button onclick="sa('${b}',${i})">+ подход</button></div>`;
+ if(a.length)h+=`<div class="row"><span class="dim">${sum2(a)}</span><button onclick="sg('${b}',${i})">Записать +${B[b].t[i][2]}</button></div>`;return h}
+function sa(b,i){const k=sk(b,i),w=+$('w'+k).value||0,n=+$('n'+k).value,c=Math.max(1,Math.min(10,+$('c'+k).value||1)),a=SS[k]=SS[k]||[];
+ if(!(n>=1&&n<=50)||w<0||w>400||(b=='pl'&&w<20))return toast('> ПОДХОД: ВЕС 0-400 КГ (в пауэрлифтинге от 20), ПОВТОРЫ 1-50');
+ if(a.length+c>15)return toast('> МАКСИМУМ 15 ПОДХОДОВ');for(let j=0;j<c;j++)a.push([w,n]);$('sb'+k).innerHTML=sbHTML(b,i)}
+function sd(b,i,j){const k=sk(b,i);SS[k].splice(j,1);$('sb'+k).innerHTML=sbHTML(b,i)}
+function sg(b,i){const k=sk(b,i),a=SS[k]||[];if(!a.length)return;const m=s=>s[0]*(s[1]>1?1+s[1]/30:1),pool=b=='pl'?a.filter(s=>s[1]<=10&&s[0]>=20):a,bs=pool.reduce((p,s)=>!p||m(s)>m(p)?s:p,null);
+ if(!bs)return toast('> НУЖЕН ПОДХОД 1-10 ПОВТОРОВ С ВЕСОМ ОТ 20 КГ');delete SS[k];add(b,i,bs[0],bs[1],a)}
+/* ГТО */
+const pv=s=>{s=String(s).trim().replace(',','.');if(!s)return NaN;if(s.includes(':')){const p=s.split(':');return(+p[0])*60+(+p[1])}return+s};
+const fm=(v,T)=>T[10]?(v>=60?Math.floor(v/60)+':'+String(Math.round(v%60)).padStart(2,'0'):v+' с'):v;
+const gtoBest=(b,i)=>{const T=B[b].t[i],a=st.log.filter(e=>e.b==b&&e.i==i).map(e=>e.v);return a.length?(T[3]=='d'?Math.min(...a):Math.max(...a)):null};
+const gtoLv=(T,v)=>{if(v==null)return 0;const n=T[7],d=T[3]=='d';return([2,1,0].find(k=>d?v<=n[k]:v>=n[k])+1)||0};
+const gl=(b,i,T)=>{const v=gtoBest(b,i),n=T[7];return`<br><span class="dim">Б ${fm(n[0],T)} · С ${fm(n[1],T)} · З ${fm(n[2],T)}${v==null?'':' · лучший '+fm(v,T)+': '+['нет знака','бронза','серебро','золото'][gtoLv(T,v)]}</span>`};
+const gtoBadge=()=>{const cs={};Object.keys(B).forEach(b=>B[b].t.forEach((T,i)=>{if(T[9]){const l=gtoLv(T,gtoBest(b,i));cs[T[11]]=Math.max(cs[T[11]]||0,l)}}));const ok=(L,n)=>'refs'.split('').every(c=>(cs[c]||0)>=L)&&'refsva'.split('').filter(c=>(cs[c]||0)>=L).length>=n;return ok(3,6)?3:ok(2,5)?2:ok(1,5)?1:0};
+const ftPanel=()=>`<div class="pn"><b>ГТО · ПЛЕЧО</b><br><span class="dim">В твоей программе исключены висы, жимы над головой и броски. Помеченные упражнения откроются после отметки врача.</span><div class="row"><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ft')">Ортопед разрешил</button></div></div>`;
+/* СПОРТ: ОБЩАЯ ВЕТКА */
+const SUB=['pl','ft','ag'],SPT=[330+Math.cos(-73.3*Math.PI/180)*76,330+Math.sin(-73.3*Math.PI/180)*76];
+const sportXP=()=>SUB.reduce((a,b)=>a+xpOf(b),0),sportF=()=>SUB.reduce((s,b)=>s+(rk(b)+(rk(b)<topR(b)?Math.max(0,Math.min(1,prog(b)/100)):0))*5/topR(b),0)/3,sportRank=()=>RN[Math.min(5,Math.floor(sportF()))],sportPct=()=>(sportF()%1)*100;
+function sportNode(){return `<g data-g="1" style="color:var(--c0);cursor:pointer"><line x1="330" y1="330" x2="${SPT[0]}" y2="${SPT[1]}" stroke="currentColor" stroke-width="2.5"/><rect x="${SPT[0]-12}" y="${SPT[1]-12}" width="24" height="24" transform="rotate(45 ${SPT[0]} ${SPT[1]})" fill="var(--bg)" stroke="currentColor" stroke-width="2"/><text x="${SPT[0]}" y="${SPT[1]}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="currentColor" stroke="none">${sportRank()}</text><text x="${SPT[0]+20}" y="${SPT[1]-14}" font-size="12" fill="currentColor" stroke="none">СПОРТ</text></g>`}
+function openSport(){cur='';let h=`<div class="box"><h2>[${sportRank()}] Спорт</h2>Общий XP: ${sportXP()}. Ранг считается как средний по трём подветкам.<br>ГТО (10 ступень): <b>${['пока нет знака','бронза','серебро','золото'][gtoBadge()]}</b> по твоим лучшим результатам. Официальный знак выдаётся только после сдачи в центре тестирования.<div class="bar"><i style="width:${sportPct()}%"></i></div>`;
+ SUB.forEach(b=>{const r=rk(b);h+=`<div class="row"><span>[${rn(b,r)}] ${B[b].n}<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog(b)))}%"></i></div></span><button onclick="openB('${b}')">Открыть</button></div>`});
+ SH.innerHTML=h+`<p class="dim">Подветки: Пауэрлифтинг (сумма трёх упражнений и разряды), Фитнес (программа по дням), Ловкость (гибкость и прыжки, открывается этапами).</p><button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
+/* ПАУЭРЛИФТИНГ И ЛОВКОСТЬ */
+function setBase(){st.base={0:+$('bs0').value||0,1:+$('bs1').value||0,2:+$('bs2').value||0};st.bw=+$('bw').value||83;save();openPL();render()}
+function offc(){const k=+$('ofs').value,p=$('ofp').value.trim();if(p.length<(k>=8?15:5))return toast(k>=8?'> ДЛЯ КМС И ВЫШЕ НУЖНО ПОДТВЕРЖДЕНИЕ (МИНИМУМ 15 СИМВОЛОВ)':'> ОПИШИ ПОДТВЕРЖДЕНИЕ');st.off=k;st.ex.push({t:Date.now(),b:'pl',r:k,p});save();toast('> ОФИЦИАЛЬНЫЙ РАЗРЯД: '+B.pl.L[k],1);openPL();render()}
+function agPanel(){const c=agC(),s=agS();return `<div class="pn"><b>ЭТАП ${s} ИЗ 2</b><br>`+c.map(q=>(q[1]?'[✓] ':'[ ] ')+q[0]).join('<br>')+`<br>Этап 2: ${best(0)>=BW()*1.5?'[✓]':'[ ]'} присед от ${Math.ceil(BW()*1.5)} кг ${st.leg?'[✓]':'[ ]'} 30 с на одной ноге в полуприседе<div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('ag')">Уролог разрешил</button><button class="${st.leg?'on':''}" onclick="st.leg=!st.leg;save();openB('ag')">30 с на одной ноге</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ag')">Ортопед разрешил</button></div><span class="dim">Ориентир NSCA, не замена врача.</span></div>`}
+function openPL(){cur='pl';const o=B.pl,L=o.L,r=plLv(),tt=plTot(),nx=o.TT[r+1],of=st.off==null?-1:st.off,bs=st.base||{};
+ let h=`<div class="box"><h2>[${L[r]}] Пауэрлифтинг</h2>Уровень по весам: <b>${L[r]}</b><br>Сумма: ${tt} кг (присед ${best(0)}, жим ${best(1)}, тяга ${best(2)}). Расчёт по формуле Эпли из веса и повторов.<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog('pl')))}%"></i></div>${nx?'До «'+L[r+1]+'»: '+Math.round((nx-tt)*2)/2+' кг':'Максимум таблицы'}<br>Официальный разряд: <b>${of>=0?L[of]:'нет'}</b><br><span class="dim">Нормы: классическое троеборье, мужчины до 83 кг, таблица ФПР 2026. Сверь с действующим приказом.</span><div class="pn"><b>СТАРТ</b> <span class="dim">(максимумы и вес тела, кг)</span><div class="row"><input id="bs0" type="number" placeholder="присед" value="${bs[0]||''}"><input id="bs1" type="number" placeholder="жим" value="${bs[1]||''}"><input id="bs2" type="number" placeholder="тяга" value="${bs[2]||''}"><input id="bw" type="number" placeholder="вес" value="${st.bw||83}"><button onclick="setBase()">ОК</button></div></div>`;
+ o.t.forEach((T,i)=>{h+=setRow('pl',i,T)});
+ h+=`<div class="pn"><b>ОФИЦИАЛЬНЫЙ РАЗРЯД</b><br><span class="dim">Только за выступление на соревновании. Для КМС и выше укажи ссылку на протокол или опиши документ.</span><div class="row"><select id="ofs">${L.map((n,k)=>k>1?`<option value="${k}">${n}</option>`:'').join('')}</select><input id="ofp" placeholder="подтверждение" style="flex:1"><button onclick="offc()">Подтвердить</button></div></div>`;
+ SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
+/* ЗАДАНИЯ */
+function tf(b){if(lk(b))return toast('> Сначала открой ветку PIN-кодом');const i=st.foc.indexOf(b);if(i>=0)st.foc.splice(i,1);else if(st.foc.length<3)st.foc.push(b);else toast('> МАКСИМУМ 3 ВЕТКИ');save();vZ()}
+function vZ(){let h=`<div class="pn"><h1>[СИСТЕМА] ЗАДАНИЯ</h1>`;
+ if(st.foc.length<3){h+=`Выбери 3 ветки в фокус недели (XP x2). Выбрано: ${st.foc.length}<div class="chips" style="margin-top:8px">`+Object.keys(B).map(b=>`<button class="${st.foc.includes(b)?'on':''}" onclick="tf('${b}')">${nm(b)}</button>`).join('')+'</div>'}
+ else h+=`Фокус недели: ${st.foc.map(nm).join(', ')} <button onclick="st.foc=[];save();vZ()">Сменить</button>`;
+ h+='</div>';let L=[['sl',0],['vh',0]];
+ st.foc.forEach(b=>B[b].t.forEach((T,i)=>{if(!lk(b)&&b!='pl'&&b!='ft'&&!T[9]&&(!T[5]||T[5]==pd())&&(b=='ag'?(T[4]||0)<=agS():(T[4]||0)<=rk(b))&&!L.some(q=>q[0]==b&&q[1]==i))L.push([b,i])}));L=L.slice(0,5);const d=day();
+ h+=`<div class="pn"><b>НА СЕГОДНЯ (до 5)</b>`;
+ L.forEach(([b,i])=>{const T=B[b].t[i],dn=st.log.some(e=>e.b==b&&e.i==i&&day(new Date(e.t))==d);
+  h+=`<div class="row"><span>${dn?'[✓] ':''}${T[0]}<br><span class="dim">${B[b].n}</span></span>${b=='ft'?`<button onclick="openB('ft')">Подходы</button>`:`<input id="d${b}${i}" type="number" inputmode="decimal" placeholder="${T[1]}"><button onclick="add('${b}',${i},+$('d${b}${i}').value)">+${T[2]*(st.foc.includes(b)?2:1)}</button>`}</div>`});
+ $('z').innerHTML=h+(pd()?'<button onclick="openB(\'ft\')">Тренировка: '+DN[pd()]+'</button> ':'')+(st.foc.includes('pl')?'<button onclick="openB(\'pl\')">Пауэрлифтинг: записать подход</button>':'')+'</div><p class="dim">Остальные задания открываются в ветке на вкладке «Навыки». Дневной лимит: '+CAP+' XP на ветку.</p>'}
+/* ДАННЫЕ */
+function rep(){const n=P=='w'?7:30,now=Date.now(),a=now-n*DAY,p=a-n*DAY,cu=st.log.filter(e=>e.t>=a),pv=st.log.filter(e=>e.t>=p&&e.t<a);
+ if(!cu.length&&!pv.length)return '<p>НЕДОСТАТОЧНО ДАННЫХ. Записывай задания или добавь демо-данные.</p>';
+ let h='',best=null,bd=0;const days=new Set(cu.map(e=>day(new Date(e.t)))).size;
+ Object.keys(B).forEach(b=>{if(lk(b))return;const c=cu.filter(e=>e.b==b),q=pv.filter(e=>e.b==b);if(!c.length&&!q.length)return;
+  const xc=sum(c,'x'),xq=sum(q,'x');if(xc-xq>bd){bd=xc-xq;best=B[b].n}
+  h+=`<div class="pn"><b>${B[b].n}</b>: XP ${xc} (было ${xq})`;
+  B[b].t.forEach((T,i)=>{if(T[9])return;const vc=agg(c.filter(e=>e.i==i),T),vq=agg(q.filter(e=>e.i==i),T);if(!vc&&!vq)return;const dl=Math.round((vc-vq)*10)/10,g=T[3]=='n'||(T[3]=='d'?dl<0:dl>0);
+   h+=`<br>${T[0]}: ${vc} ${T[1]} (было ${vq}) <b style="color:${dl&&!g?'var(--amb)':'inherit'}">${dl>0?'+':''}${dl}</b>`});h+='</div>'});
+ return `<p>Активных дней: ${days} из ${n}. Считает программа по записям.</p>`+(best?`<p>> ЛУЧШЕЕ ЗА ПЕРИОД: ${best}, +${bd} XP</p>`:'')+h}
+function rm(t){const i=st.log.findIndex(e=>e.t==t);if(i>=0&&Date.now()-t<DAY){drop(e=>e.t==t||e.m==t);save();toast('> ЗАПИСЬ ОТМЕНЕНА');vD()}}
+function vD(){let h=`<div class="pn"><h1>[СИСТЕМА] ДАННЫЕ</h1><div class="row"><button class="${P=='w'?'on':''}" onclick="P='w';vD()">Неделя</button><button class="${P=='m'?'on':''}" onclick="P='m';vD()">Месяц</button></div>${rep()}</div>
+ <div class="pn"><b>ЖУРНАЛ</b> <span class="dim">(отмена возможна 24 часа)</span>`;
+ st.log.filter(e=>!e.m).slice(-12).reverse().forEach(e=>{const T=B[e.b].t[e.i]||['?',''];h+=`<div class="row"><span>${day(new Date(e.t)).slice(5)} · ${lk(e.b)?'ЗАСЕКРЕЧЕНО':T[0]+': '+(e.sets?e.sets.map(s=>s[0]+'×'+s[1]).join(' '):e.v+' '+T[1])} · +${e.x} XP</span>${Date.now()-e.t<DAY?`<button onclick="rm(${e.t})">Отмена</button>`:'<span class="dim" style="flex:0">заперто</span>'}</div>`});
+ const hasDemo=st.log.some(e=>e.demo);
+ h+=`</div>`+accPanel()+`<div class="pn"><b>ИНСТРУМЕНТЫ</b><div class="row">${hasDemo?'<button onclick="undemo()">Убрать демо</button>':'<button onclick="demo()">Демо-данные</button>'}<button onclick="$('ex').value=JSON.stringify(st)">Экспорт</button><button onclick="imp()">Импорт</button><button id="rs" onclick="reset()">Сброс</button></div>${hasDemo?'<span class="dim">Сейчас в журнале есть демо-записи. Кнопка «Убрать демо» удалит только их.</span>':''}<textarea id="ex" style="width:100%;height:70px" placeholder="Резервная копия: нажми Экспорт и скопируй текст. Для импорта вставь текст сюда."></textarea></div>`;$('d').innerHTML=h}
+/* Демо-записи помечены и удаляются отдельно, не трогая настоящие. Закрытые PIN-ветки демо не получают */
+function demo(){const ks=Object.keys(B).filter(b=>!LKG[b]&&b!='pl'),now=Date.now();
+ for(let d=0;d<60;d++){if(Math.random()<.3)continue;for(let j=0;j<3;j++){const b=ks[Math.floor(Math.random()*ks.length)],i=Math.floor(Math.random()*2),T=B[b].t[i];if(T[9])continue;st.log.push({t:Math.round(now-d*DAY-Math.random()*8e6),b,i,v:T[1]=='мин'?10+Math.floor(Math.random()*50):1+Math.floor(Math.random()*5),x:T[2],demo:1})}}
+ st.log.sort((a,b)=>a.t-b.t);save();toast('> ДЕМО-ДАННЫЕ ДОБАВЛЕНЫ');render()}
+function undemo(){drop(e=>e.demo);save();toast('> ДЕМО-ДАННЫЕ УДАЛЕНЫ');render()}
+function imp(){try{const o=JSON.parse($('ex').value);if(!o||!Array.isArray(o.log))throw 0;st=clean(o);save();toast('> ДАННЫЕ ЗАГРУЖЕНЫ');render()}catch(e){toast('> ОШИБКА: неверный текст копии')}}
+function reset(){const b=$('rs');if(!rs){rs=1;b.textContent='Точно? Ещё раз';setTimeout(()=>{rs=0;if($('rs'))$('rs').textContent='Сброс'},3000);return}st=fresh();st.rst=Date.now();rs=0;un={};save();toast(user?'> ВСЕ ДАННЫЕ УДАЛЕНЫ, В ОБЛАКЕ ТОЖЕ':'> ВСЕ ДАННЫЕ УДАЛЕНЫ');render()}
+/* ОБЛАКО: Supabase. Ключ publishable публичный по задумке; доступ к строкам закрыт политиками RLS (см. supabase/schema.sql) */
+const SB_URL='https://czsccnwayexwiewyutkp.supabase.co',SB_KEY='sb_publishable_PcENrn-tVgk8ovEeAPSCSg_o-ge7v9A',TB='sll_state';
+let sb=null,user=null,pushT=0,busy=0,again=0,sync='';
+try{if(window.supabase)sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){sb=null}
+/* Слияние двух копий: журналы объединяются, удалённое (del) и всё до сброса (rst) отбрасывается, настройки берутся из более свежей копии */
+function merge(a,b){const rst=Math.max(a.rst||0,b.rst||0),newer=(x,y)=>(x.rst||0)!=(y.rst||0)?(x.rst||0)>(y.rst||0):(x.ts||0)>=(y.ts||0);
+ const[o,n]=newer(a,b)?[b,a]:[a,b],live=[a,b].filter(x=>(x.rst||0)==rst),del=new Set([...a.del,...b.del]);
+ const uni=(x,y,key)=>{const m=new Map();[...x,...y].forEach(e=>{if(!del.has(e.t)&&!del.has(e.m)&&e.t>rst)m.set(key(e),e)});return[...m.values()].sort((p,q)=>p.t-q.t)};
+ const s=Object.assign({},live.length>1?o:{},n);
+ s.log=uni(a.log,b.log,e=>e.t+'|'+e.b+'|'+e.i);s.ex=uni(a.ex,b.ex,e=>e.t+'|'+e.b);
+ s.del=[...del].slice(-5000);s.rst=rst;
+ s.r={};live.forEach(x=>Object.keys(x.r).forEach(k=>{s.r[k]=Math.max(s.r[k]||0,x.r[k])}));
+ s.sick=Object.assign({},...live.map(x=>x.sick));
+ if(live.length>1&&a.last!=b.last){const w=a.last>b.last?a:b;s.last=w.last;s.streak=w.streak}
+ s.ts=Math.max(a.ts||0,b.ts||0);return s}
+function schedPush(){if(!user)return;clearTimeout(pushT);pushT=setTimeout(push,1500)}
+async function fetchRemote(){const{data,error}=await sb.from(TB).select('data').eq('user_id',user.id).maybeSingle();if(error)throw error;return data?clean(data.data):null}
+async function push(){if(!sb||!user)return;if(busy){again=1;return}busy=1;
+ try{const r=await fetchRemote();if(r)st=merge(st,r);saveLocal();
+  const{error}=await sb.from(TB).upsert({user_id:user.id,data:st,updated_at:new Date().toISOString()});if(error)throw error;
+  sync='Синхронизировано '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
+ catch(e){sync='Нет связи с облаком. Данные сохранены на устройстве, отправлю позже'}
+ busy=0;if(tab=='d'&&!SH.style.display.includes('block'))vD();if(again){again=0;push()}}
+async function pull(){if(!sb||!user||busy)return;busy=1;
+ try{const r=await fetchRemote();if(r){const before=JSON.stringify(st);st=merge(st,r);if(JSON.stringify(st)!=before){saveLocal();render()}}sync='Синхронизировано '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
+ catch(e){sync='Нет связи с облаком'}busy=0;push()}
+function accPanel(){if(!sb)return `<div class="pn"><b>ОБЛАКО</b><br><span class="dim">Библиотека облака не загрузилась. Приложение работает только на этом устройстве.</span></div>`;
+ if(user)return `<div class="pn"><b>ОБЛАКО</b><br>Аккаунт: ${esc(user.email||'')}<br><span class="dim">${esc(sync||'Синхронизация…')}</span><div class="row"><button onclick="push()">Синхронизировать</button><button onclick="logout()">Выйти</button></div><span class="dim">Записи сохраняются на устройстве и отправляются в облако. Видишь их только ты.</span></div>`;
+ return `<div class="pn"><b>ОБЛАКО</b><br><span class="dim">Войди, чтобы данные хранились в облаке и были на всех устройствах. Без входа всё хранится только в этом браузере.</span>
+ <input id="em" type="email" autocomplete="email" placeholder="почта" style="width:100%;margin:6px 0"><input id="pw" type="password" autocomplete="current-password" placeholder="пароль (от 8 символов)" style="width:100%;margin:0 0 6px">
+ <div class="row"><button onclick="login()">Войти</button><button onclick="signup()">Регистрация</button><button onclick="forgot()">Забыл пароль</button></div></div>`}
+const creds=()=>{const e=$('em').value.trim(),p=$('pw').value;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){toast('> ВВЕДИ ПОЧТУ');return null}return{email:e,password:p}};
+const here=()=>location.origin+location.pathname;
+async function login(){const c=creds();if(!c)return;const{error}=await sb.auth.signInWithPassword(c);if(error)return toast('> НЕ ВОШЁЛ: неверная почта или пароль');toast('> ВХОД ВЫПОЛНЕН')}
+async function signup(){const c=creds();if(!c)return;if(c.password.length<8)return toast('> ПАРОЛЬ: МИНИМУМ 8 СИМВОЛОВ');const{data,error}=await sb.auth.signUp({...c,options:{emailRedirectTo:here()}});if(error)return toast('> ОШИБКА РЕГИСТРАЦИИ: '+error.message);toast(data.session?'> АККАУНТ СОЗДАН':'> ПРОВЕРЬ ПОЧТУ И ПОДТВЕРДИ АДРЕС')}
+async function forgot(){const e=$('em').value.trim();if(!e)return toast('> ВВЕДИ ПОЧТУ');await sb.auth.resetPasswordForEmail(e,{redirectTo:here()});toast('> ЕСЛИ АККАУНТ ЕСТЬ, ПИСЬМО ОТПРАВЛЕНО')}
+async function logout(){await push();await sb.auth.signOut();toast('> ВЫХОД. ДАННЫЕ ОСТАЛИСЬ НА УСТРОЙСТВЕ');render()}
+function newPw(){SH.innerHTML=`<div class="box"><h2>НОВЫЙ ПАРОЛЬ</h2><input id="npw" type="password" autocomplete="new-password" placeholder="от 8 символов" style="width:100%"><div class="row"><button onclick="setPw()">Сохранить</button><button onclick="closeS()">Закрыть</button></div></div>`;SH.style.display='block'}
+async function setPw(){const p=$('npw').value;if(p.length<8)return toast('> МИНИМУМ 8 СИМВОЛОВ');const{error}=await sb.auth.updateUser({password:p});if(error)return toast('> ОШИБКА: '+error.message);toast('> ПАРОЛЬ ИЗМЕНЁН');closeS()}
+if(sb)sb.auth.onAuthStateChange((ev,s)=>{const was=user&&user.id;user=s?s.user:null;
+ if(ev=='PASSWORD_RECOVERY')setTimeout(newPw,0);
+ if(user&&user.id!=was)setTimeout(pull,0);if(!user)sync='';if(tab=='d')setTimeout(vD,0)});
+render();
+</script></body></html>
