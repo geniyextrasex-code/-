@@ -14,9 +14,11 @@
 <script src="vendor/supabase.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap">
 <style>
-:root{--bg:#dcefd6;--fg:#0b4d16;--dim:#5b8f63;--amb:#8a5a00;--pan:#cfe6c8;--c0:#0b4d16;--c1:#8a5a00;--c2:#0b5a52;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a05;--fg:#2bff4f;--dim:#0f7a24;--amb:#ffb000;--pan:#08140a;--c0:#2bff4f;--c1:#ffb000;--c2:#2bffd0}}
-:root[data-theme="dark"]{--bg:#050a05;--fg:#2bff4f;--dim:#0f7a24;--amb:#ffb000;--pan:#08140a;--c0:#2bff4f;--c1:#ffb000;--c2:#2bffd0}
+:root{--bg:#050a05;--fg:#2bff4f;--dim:#0f7a24;--amb:#ffb000;--pan:#08140a;--c0:#2bff4f;--c1:#ffb000;--c2:#2bffd0;--warn:#ff6b3d;--r0:#8fa88f;--r1:#2bff4f;--r2:#2bffd0;--r3:#4da3ff;--r4:#c77dff;--r5:#ffd23f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="amber"]{--bg:#0a0700;--fg:#ffb000;--dim:#8a5f00;--pan:#140e02;--amb:#ff8a3d;--c0:#ffb000;--c1:#ffe08a;--c2:#ff8a3d;--warn:#ff5050}
+:root[data-theme="system"]{--bg:#050914;--fg:#5ec8ff;--dim:#1f5f8f;--pan:#0a1426;--amb:#ffcc4d;--c0:#ff7b7b;--c1:#ffcc4d;--c2:#5ec8ff;--warn:#ff6b6b}
+:root[data-theme="light"]{--bg:#dcefd6;--fg:#0b4d16;--dim:#5b8f63;--amb:#8a5a00;--pan:#cfe6c8;--c0:#0b4d16;--c1:#8a5a00;--c2:#0b5a52;--warn:#b5401a;--r0:#5b6b5b;--r1:#0b6b1e;--r2:#0b6b62;--r3:#1d5fb3;--r4:#7b3fb0;--r5:#8a6200}
+@media(prefers-color-scheme:light){:root:not([data-theme]){--bg:#dcefd6;--fg:#0b4d16;--dim:#5b8f63;--amb:#8a5a00;--pan:#cfe6c8;--c0:#0b4d16;--c1:#8a5a00;--c2:#0b5a52;--warn:#b5401a;--r0:#5b6b5b;--r1:#0b6b1e;--r2:#0b6b62;--r3:#1d5fb3;--r4:#7b3fb0;--r5:#8a6200}}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:15px/1.45 'Share Tech Mono',ui-monospace,monospace;text-shadow:0 0 4px color-mix(in srgb,var(--fg) 40%,transparent)}
 body.crt::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
@@ -57,6 +59,17 @@ nav button{flex:1;border:0;border-right:1px solid var(--dim)}
 #toast div{background:var(--bg);border:1px solid var(--fg);padding:8px 10px;margin-bottom:6px}
 #toast .big{font:400 26px/1.1 'VT323',monospace;text-align:center;padding:30px 10px;border-width:2px;margin-top:30vh}
 #sh{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:15}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.sc{cursor:pointer;padding:8px}
+.sc .bar i{background:currentColor}
+.help td{padding:4px 6px;border-bottom:1px solid var(--dim)}
+#onb{position:fixed;inset:0;z-index:24;background:var(--bg);display:none;overflow:auto;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 30px}
+#onb .pn{max-width:520px;margin:4vh auto 0}
+#onb input{width:100%;margin:0 0 8px}
+#onb label{display:block;margin-top:6px}
+#gate{position:fixed;inset:0;z-index:25;background:var(--bg);display:none;overflow:auto;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 20px}
+#gate .pn{max-width:420px;margin:12vh auto 0}
+#gate input{width:100%;margin:0 0 8px}
 #sh .box{position:absolute;left:0;right:0;bottom:0;max-height:86%;overflow:auto;background:var(--bg);border-top:2px solid var(--fg);padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto}
 </style></head><body class="crt">
 <main>
@@ -68,10 +81,12 @@ nav button{flex:1;border:0;border-right:1px solid var(--dim)}
 <div class="v" id="d" style="display:none"></div>
 </main>
 <div id="sh" onclick="if(event.target==this)closeS()"></div>
+<div id="onb"></div>
+<div id="gate"></div>
 <div id="toast"></div>
 <nav><button data-t="s" onclick="go('s')">Статус</button><button data-t="n" onclick="go('n')">Навыки</button><button data-t="z" onclick="go('z')">Задания</button><button data-t="d" onclick="go('d')">Данные</button></nav>
 <script>
-const RN=['E','D','C','B','A','S'],TH=[0,100,300,700,1500,3000],CAP=120,DAY=864e5;
+const RN=['E','D','C','B','A','S'],RNN=['Новичок','Ученик','Практик','Мастер','Эксперт','Легенда'],TH=[0,100,300,700,1500,3000],CAP=120,DAY=864e5;
 const PL=['Изгой','Бродяга','Странник','Следопыт','Наёмник','Ветеран','Страж','Командир','Легенда','Титан'];
 const GR={zd:{n:'Здоровье',c:['hb','ob','vh']},sp:{n:'Спорт',c:['pl','ft','ag']}},KID=['hb','ob','vh','pl','ft','ag'];
 const CL=[['ТЕЛО',['zd','ps','sl','nv','sp']],['РЕМЕСЛО И ДЕНЬГИ',['hm','md','fn','or']],['ДОМ И ЛЮДИ',['hs','ck','dd','pt','fm','ch']]];
@@ -84,7 +99,7 @@ vh:{n:'Вредные привычки',s:'Привычки',e:'30 дней бе
 ps:{n:'Психика',s:'Психика',e:'30 дней ежедневных отметок настроения и энергии',t:[['Настроение','балл',10],['Стресс','балл',10,'d'],['Энергия','балл',10]]},
 sl:{n:'Сон',s:'Сон',e:'14 дней: отбой до 23:00 не меньше 5 из 7 ночей',t:[['Сон за ночь','ч',15],['Бодрость утром','балл',10]]},
 nv:{n:'Питание и вес',s:'Питание',e:'4 недели учёта веса и питания без пропусков',t:[['Вес тела','кг',10,'n'],['Питание по плану','раз',10]]},
-pl:{n:'Пауэрлифтинг',e:'—',L:['Обыватель','Начинающий','III юн.','II юн.','I юн.','III разряд','II разряд','I разряд','КМС','МС','МСМК'],TT:[0,220,255,290,320,350,400,465,515,665,770],t:[['Присед','кг',20,'u',0,0,'4×6–8, пятница'],['Жим лёжа','кг',20,'u',0,0,'4×6–8, среда'],['Становая тяга','кг',20,'u',0,0,'4×5, понедельник']]},
+pl:{n:'Пауэрлифтинг',e:'—',L:[],TT:[],t:[['Присед','кг',20,'u',0,0,'4×6–8, пятница'],['Жим лёжа','кг',20,'u',0,0,'4×6–8, среда'],['Становая тяга','кг',20,'u',0,0,'4×5, понедельник']]},
 ft:{n:'Фитнес',e:'Рост рабочих весов в 5 упражнениях за 8 недель',t:[['Жим гантелей на наклонной (гантель)','кг',10,'u',0,1,'3×8–10'],['Тяга горизонтального блока','кг',10,'u',0,1,'3×8–10'],['Подъём на носки в тренажёре','кг',10,'u',0,1,'3×15–20'],['Блок: плечо и кор','мин',10,'u',0,1,'7 мин'],['Болгарский сплит-присед (гантель)','кг',10,'u',0,2,'3×8–10 на ногу'],['Тяга верхнего блока','кг',10,'u',0,2,'3×10–12'],['Махи гантелями в стороны','кг',10,'u',0,2,'3×12–15'],['Блок: плечо и кор','мин',10,'u',0,2,'7 мин'],['Жим в тренажёре сидя','кг',10,'u',0,3,'3×10–12'],['Тяга гантели одной рукой','кг',10,'u',0,3,'3×8–10'],['Сгибания ног в тренажёре','кг',10,'u',0,3,'3×10–12'],['Блок: плечо','мин',10,'u',0,3,'6 мин'],['Румынская тяга','кг',10,'u',0,4,'3×8–10'],['Молот + трицепс в блоке','кг',10,'u',0,4,'3×10–12'],['Махи в наклоне','кг',10,'u',0,4,'3×12–15'],['Блок: плечо и кор','мин',10,'u',0,4,'7 мин'],G('Подтягивание, высокая перекладина','раз','u',[4,8,13],'s',{sh:1}),G('Подтягивание, низкая перекладина 90 см','раз','u',[10,15,23],'s'),G('Отжимания от пола','раз','u',[15,19,33],'s'),G('Рывок гири 16 кг','раз','u',[18,22,40],'s',{sh:1}),G('Поднимание туловища за 1 мин','раз','u',[25,32,42],'v'),G('Бег 3000 м','м:сс','d',[930,870,780],'e',{t:1}),G('Бег 1000 м','м:сс','d',[302,246,225],'e',{t:1}),G('Кросс 5 км','м:сс','d',[1710,1560,1350],'e',{t:1}),G('Лыжи 5 км','м:сс','d',[1770,1590,1380],'e',{t:1}),G('Плавание 50 м','м:сс','d',[82,65,55],'a',{t:1,sh:1}),['Становая тяга','кг',20,'u',0,1,'4×5 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',2],-1],['Жим лёжа','кг',20,'u',0,2,'4×6–8 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',1],-1],['Присед','кг',20,'u',0,3,'4×6–8 · идёт и в Пауэрлифтинг',null,0,0,0,'',0,['pl',0],-1]]},
 ag:{n:'Ловкость',e:'Прыжок в длину с места: личный рекорд, подтверждённый видео',t:[['Растяжка','мин',10,'u',0],['Шпагат: расстояние до пола','см',15,'d',0],['Прыжки на месте (контактов)','шт',15,'u',1],['Спрыгивания с тумбы 20–30 см','шт',15,'u',1],['Прыжок в высоту с места','см',30,'u',2],['Прыжок в длину с места','см',30,'u',2],['Прыжки на тумбу','шт',20,'u',2],G('Бег 60 м','с','d',[12.3,10.9,8.8],'r',{t:1,s:1}),G('Наклон вперёд (см от уровня скамьи)','см','u',[3,5,11],'f',{n:1}),G('Прыжок в длину с места','см','u',[197,213,234],'v',{s:2}),G('Метание снаряда 700 г','м','u',[26,30,35],'a',{sh:1}),G('Стрельба 10 м','очки','u',[15,20,25],'a'),G('Туристский поход 10 км+ (навыки)','навыков','u',[3,5,7],'a')]},
 hm:{n:'Хендимен',e:'Первый платный заказ',t:[['Изучение навыка','мин',15],['Практика с фото','шт',25],['Платный заказ','заказ',80,'u',1]]},
@@ -98,6 +113,12 @@ pt:{n:'Партнёр',e:'4 свидания за месяц',t:[['Время в
 fm:{n:'Семья',e:'Годовой план по каждому ребёнку',t:[['Разбор плана по детям','раз',25],['Воспитательный урок','раз',25],['Годовой план ребёнка','шт',70,'u',1]]},
 ch:{n:'Харизма',e:'8 встреч за 2 месяца',t:[['Встреча вне семьи','раз',25],['Новое знакомство','раз',25],['Организовал встречу','раз',50,'u',1]]}
 };
+/* Классическое троеборье, сумма трёх упражнений. Порядок: III юн., II юн., I юн., III, II, I, КМС, МС, МСМК.
+   Источник: классификация, утверждённая приказом Минспорта России от 09.04.2026 № 299 (таблица ФПР СПб, действует с 09.06.2026). */
+const PLN={m:{53:[185,200,215,240,265,300,340],59:[205,225,245,275,300,350,390,472.5,550],66:[215,245,270,305,335,390,435,545,640],74:[230,260,295,325,365,425,475,600,705],83:[255,290,320,350,400,465,515,665,770],93:[275,315,345,385,430,490,550,710,810],105:[300,330,370,415,460,515,600,740,850],120:[325,355,395,455,505,560,640,775,880],'120+':[345,370,425,485,525,590,690,820,930]},
+ f:{43:[90,97.5,105,115,125,150,180],47:[97.5,105,115,125,145,175,220,280,350],52:[105,115,125,145,170,200,255,315,385],57:[115,125,145,165,185,215,285,340,410],63:[125,140,160,180,200,240,315,365,440],69:[137.5,150,170,190,222.5,260,330,380,460],76:[150,170,190,210,242.5,285,345,395,480],84:[160,180,200,220,255,300,355,405,500],'84+':[180,200,220,250,285,320,375,420,550]}};
+const PLNAMES=['III юн.','II юн.','I юн.','III разряд','II разряд','I разряд','КМС','МС','МСМК'];
+const wcls=(sex,bw)=>{const L=sex=='f'?[43,47,52,57,63,69,76,84]:[53,59,66,74,83,93,105,120];return String(L.find(c=>bw<=c)||L[L.length-1]+'+')};
 const $=id=>document.getElementById(id),SV=$('svg'),SH=$('sh'),TO=$('toast');
 const day=d=>(d||new Date()).toLocaleDateString('sv'),sum=(a,k)=>Math.round(a.reduce((s,e)=>s+e[k],0)*10)/10;
 const K='sll1';let st=null,tab='s',cur='',un={},P='w',vb=[0,0,660,660],drag=null,moved=0,rs=0;
@@ -112,12 +133,15 @@ function clean(o){const s=Object.assign(fresh(),o&&typeof o=='object'?o:{});
  s.r=Object.fromEntries(Object.entries(s.r||{}).filter(([k])=>B[k]).map(([k,v])=>[k,Math.max(0,Math.min(5,num(v)|0))]));
  s.foc=(Array.isArray(s.foc)?s.foc:[]).filter(b=>B[b]).slice(0,3);
  s.del=(Array.isArray(s.del)?s.del:[]).map(num);s.rst=num(s.rst);s.ts=num(s.ts);s.streak=num(s.streak)|0;
- s.last=/^\d{4}-\d\d-\d\d$/.test(s.last)?s.last:'';s.fw=String(s.fw||'');
+ s.last=/^\d{4}-\d\d-\d\d$/.test(s.last)?s.last:'';s.fw=String(s.fw||'');s.fpr=String(s.fpr||'');if(s.advh&&typeof s.advh=='object')s.advh=Object.fromEntries(Object.entries(s.advh).map(([k,v])=>[String(k).slice(0,40),String(v)]).slice(-50));else delete s.advh;
  s.fz={m:String((s.fz||{}).m||''),n:Math.max(0,Math.min(2,num((s.fz||{}).n)))};
  s.sick=Object.fromEntries(Object.keys(s.sick||{}).filter(k=>/^\d{4}-\d\d-\d\d$/.test(k)).map(k=>[k,1]));
  if(s.bw!=null)s.bw=num(s.bw)||83;if(s.base)s.base={0:num(s.base[0]),1:num(s.base[1]),2:num(s.base[2])};
- if(s.off!=null)s.off=num(s.off)|0;if(!['','dark','light'].includes(s.th))s.th='';if(!['a','c','m'].includes(s.vm))delete s.vm;
+ if(s.off!=null)s.off=num(s.off)|0;if(!['','dark','term','amber','system','light'].includes(s.th))s.th='';if(!['a','c','m'].includes(s.vm))delete s.vm;
  ['pin','pinh'].forEach(k=>{if(s[k]!=null&&typeof s[k]!='string')delete s[k]});
+ if(s.sx&&typeof s.sx=='object')s.sx=Object.fromEntries(Object.entries(s.sx).filter(([k])=>B[k]).map(([k,v])=>[k,Math.max(0,num(v))]));else delete s.sx;
+ if(s.prof&&typeof s.prof=='object'){const q=s.prof;s.prof={name:String(q.name||'').slice(0,40),bd:/^\d{4}-\d\d-\d\d$/.test(q.bd)?q.bd:'',sex:q.sex=='f'?'f':'m',h:Math.max(0,Math.min(250,num(q.h)))}}else delete s.prof;
+ s.doc=!!s.doc;s.ortho=!!s.ortho;s.leg=!!s.leg;
  return s}
 if(!st||!Array.isArray(st.log))st=fresh();if(!st.v2){try{localStorage.setItem(K+'_bak',JSON.stringify(st))}catch(e){}const M={0:['sl',0],1:['vh',0],2:['ob',0]};st.log.forEach(e=>{if(e.b=='hp'){const m=M[e.i];if(m){e.b=m[0];e.i=m[1]}else e.b='ob'}});(st.ex||[]).forEach(e=>{if(e.b=='hp')e.b='ob'});if(st.r&&st.r.hp!=null){st.r.ob=Math.max(st.r.ob||0,st.r.hp);delete st.r.hp}st.v2=1;try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}}st=clean(st);
 const saveLocal=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
@@ -127,27 +151,30 @@ const drop=pred=>{st.log.forEach(e=>{if(pred(e))st.del.push(e.t)});st.log=st.log
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const wk=()=>{const d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));return day(d)};
 if(st.fw!=wk()){st.fw=wk();st.foc=[]}
-if(st.th)document.documentElement.dataset.theme=st.th;
+if(st.th=='dark')st.th='term';if(st.th)document.documentElement.dataset.theme=st.th;
 document.body.classList.toggle('crt',!!st.crt);
 const e1=e=>e.rp>1?e.v*(1+e.rp/30):e.v,best=i=>Math.round(Math.max((st.base||{})[i]||0,...st.log.filter(e=>e.b=='pl'&&e.i==i).map(e1))*2)/2,plTot=()=>best(0)+best(1)+best(2),plLv=()=>{let r=0;B.pl.TT.forEach((q,k)=>{if(plTot()>=q)r=k});return r};
-const rk=b=>b=='pl'?plLv():(st.r[b]||0),xpOf=b=>st.log.reduce((a,e)=>e.b==b?a+e.x:a,0),tot=()=>st.log.reduce((a,e)=>a+e.x,0);
-const topR=b=>(B[b].L||RN).length-1,rn=(b,r)=>(B[b].L||RN)[r],DN=['','ДЕНЬ 1 · ПН · ТЯГА','ДЕНЬ 2 · СР · ЖИМ','ДЕНЬ 3 · ПТ · ПРИСЕД','ДЕНЬ 4 · ВС · ЛЁГКИЙ'],pd=()=>({1:1,3:2,5:3,0:4})[new Date().getDay()]||0;
+const rk=b=>b=='pl'?plLv():(st.r[b]||0),xpOf=b=>st.log.reduce((a,e)=>e.b==b?a+e.x:a,0)+((st.sx||{})[b]||0),tot=()=>st.log.reduce((a,e)=>a+e.x,0);
+const topR=b=>(B[b].L||RN).length-1,rn=(b,r)=>b=='pl'?B.pl.L[r]:RN[r]+' · '+RNN[r],DN=['','ДЕНЬ 1 · ПН · ТЯГА','ДЕНЬ 2 · СР · ЖИМ','ДЕНЬ 3 · ПТ · ПРИСЕД','ДЕНЬ 4 · ВС · ЛЁГКИЙ'],pd=()=>({1:1,3:2,5:3,0:4})[new Date().getDay()]||0;
 const prog=b=>{const r=rk(b);if(r>=topR(b))return 100;if(b=='pl'){const T=B.pl.TT;return(plTot()-T[r])/(T[r+1]-T[r])*100}return(xpOf(b)-TH[r])/(TH[r+1]-TH[r])*100};
-const BW=()=>st.bw||83,wks=()=>{const a=st.log.filter(e=>e.b=='pl'||e.b=='ft').map(e=>e.t);return a.length?Math.floor((Date.now()-Math.min(...a))/(7*DAY)):0};
-const agC=()=>[['Не меньше 8 недель записей в базе (сейчас '+wks()+')',wks()>=8],['Разрешение уролога (отметка ниже)',!!st.doc],['Присед не меньше 1,25 веса тела: '+Math.ceil(BW()*1.25)+' кг (сейчас '+best(0)+')',best(0)>=BW()*1.25]],agS=()=>agC().every(q=>q[1])?(best(0)>=BW()*1.5&&st.leg?2:1):0;
-const lvl=()=>Math.floor(Math.sqrt(tot()/40))+1,nm=b=>lk(b)?'ЗАСЕКРЕЧЕНО':B[b].n;
+const BW=()=>st.bw||83,SEX=()=>(st.prof&&st.prof.sex)||'m',
+ applyProfile=()=>{const sx=SEX(),c=wcls(sx,BW()),n=PLN[sx][c];B.pl.cls=c;B.pl.L=['Обыватель','Начинающий',...PLNAMES.slice(0,n.length)];B.pl.TT=[0,Math.round(n[0]*.86/5)*5,...n];B.dd.n=sx=='f'?'Мама':'Папа'},
+ age=()=>{const d=st.prof&&st.prof.bd;if(!d)return null;const b=new Date(d+'T00:00'),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a},
+ gtoOK=()=>{if(!st.prof)return true;const a=age();return SEX()=='m'&&(a==null||(a>=30&&a<=34))},wks=()=>{const a=st.log.filter(e=>e.b=='pl'||e.b=='ft').map(e=>e.t);return a.length?Math.floor((Date.now()-Math.min(...a))/(7*DAY)):0};
+const agC=()=>[['Не меньше 8 недель записей в базе (сейчас '+wks()+')',wks()>=8],['Врач разрешил прыжки (отметка ниже или в профиле)',!!st.doc],['Присед не меньше 1,25 веса тела: '+Math.ceil(BW()*1.25)+' кг (сейчас '+best(0)+')',best(0)>=BW()*1.25]],agS=()=>agC().every(q=>q[1])?(best(0)>=BW()*1.5&&st.leg?2:1):0;
+const lvl=()=>Math.floor(Math.sqrt(tot()/40))+1,nm=b=>lk(b)?'🔒 Засекречено':(LKG[b]?'🔓 ':'')+B[b].n;
 const gap=()=>st.last?Math.round((new Date(day())-new Date(st.last))/DAY):99;
 const fzLeft=()=>{const m=day().slice(0,7);if(st.fz.m!=m)st.fz={m,n:2};return st.fz.n};
 const shown=()=>gap()>2?0:st.streak;
 const yday=()=>{const d=new Date();d.setDate(d.getDate()-1);return day(d)};
 function toast(m,big){const d=document.createElement('div');d.textContent=m;if(big)d.className='big';TO.appendChild(d);setTimeout(()=>d.remove(),big?3200:2400)}
 function go(t){tab=t;render()}
-function render(){if(st.fw!=wk()){st.fw=wk();st.foc=[]}document.querySelectorAll('.v').forEach(v=>v.style.display='none');$(tab).style.display='block';
+function render(){applyProfile();if(st.fw!=wk()){st.fw=wk();st.foc=[]}document.querySelectorAll('.v').forEach(v=>v.style.display='none');$(tab).style.display='block';
  if(tab=='s')vS();if(tab=='n')vK();if(tab=='z')vZ();if(tab=='d')vD();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
 function act(){const g=gap();if(g==0)return;st.streak=g==1?st.streak+1:1;st.last=day()}
 function capUsed(b){const d=day();return st.log.reduce((a,e)=>e.b==b&&day(new Date(e.t))==d?a+e.x:a,0)}
-function add(b,i,v,rp,sets){if(!sets&&!(v>0)&&!(B[b].t[i][12]&&isFinite(v)))return toast('> ВВЕДИ РЕЗУЛЬТАТ');if(B[b].t[i][1]=='балл'&&(v<1||v>5))return toast('> ШКАЛА 1-5');if(b=='nv'&&i==0&&v>=30&&v<=300)st.bw=v;if(b=='pl'&&(!(rp>=1&&rp<=10)||v<20||v>400))return toast('> ПОВТОРЫ 1-10, ВЕС 20-400 КГ');
+function add(b,i,v,rp,sets){if(!sets&&!(v>0)&&!(B[b].t[i][12]&&isFinite(v))&&!(B[b].t[i][3]=='d'&&v===0))return toast('> ВВЕДИ РЕЗУЛЬТАТ');if(B[b].t[i][1]=='балл'&&(v<1||v>5))return toast('> ШКАЛА 1-5');if(b=='nv'&&i==0&&v>=30&&v<=300)st.bw=v;if(b=='pl'&&(!(rp>=1&&rp<=10)||v<20||v>400))return toast('> ПОВТОРЫ 1-10, ВЕС 20-400 КГ');
  const T=B[b].t[i];let x=T[2]*(st.foc.includes(b)?2:1);x=Math.max(0,Math.min(x,CAP-capUsed(b)));const L0=lvl();
  if(sets)twRoll();st.log.push({t:Date.now(),b,i,v,x,rp,sets});mir(b,i);act();save();
  toast('> ЗАДАНИЕ ВЫПОЛНЕНО. +'+x+' XP'+(x?'':' (ЛИМИТ ДНЯ)'));
@@ -158,15 +185,45 @@ function covers(sick){const g=gap();if(g==0)return toast('> СЕГОДНЯ УЖ�
  if(sick)st.sick[yday()]=1;else{if(fzLeft()<1)return toast('> ЗАМОРОЗОК НЕТ');st.fz.n--}
  st.last=yday();save();toast(sick?'> БОЛЬНОЙ ДЕНЬ ЗАПИСАН. СЕРИЯ СОХРАНЕНА':'> СЕРИЯ ЗАМОРОЖЕНА');render()}
 /* СТАТУС */
-function vS(){const L=lvl(),t=tot(),a=40*(L-1)**2,n=40*L*L,ks=Object.keys(B),avg=ks.reduce((s,b)=>s+rk(b)*5/topR(b),0)/ks.length;
- let h=`<div class="pn"><h1>[СИСТЕМА] СТАТУС</h1>УРОВЕНЬ ${L} · ${PL[Math.min(9,Math.floor((L-1)/2))]}
- <div class="bar"><i style="width:${(t-a)/(n-a)*100}%"></i></div>${t} из ${n} XP<br>Сводный ранг: ${RN[Math.round(avg)]} · Серия: ${shown()} дн. · Заморозок: ${fzLeft()}${gap()==2&&st.streak?'<br><b style="color:var(--amb)">> ВЧЕРА ПРОПУЩЕНО. Закрой день заморозкой или больным днём до первой записи сегодня, иначе серия начнётся заново.</b>':''}
- ${gap()==2&&st.streak?'<div class="row" style="margin-top:8px"><button onclick="covers(0)">Заморозка</button><button onclick="covers(1)">Больной день</button></div>':''}</div><div class="pn"><b>ВЕТКИ</b>${Object.keys(GR).map(g=>`<div class="row" onclick="openG('${g}')"><span>[${gRank(g)}] ${GR[g].n.toUpperCase()} (группа)<div class="bar"><i style="width:${gPct(g)}%"></i></div></span><span class="dim" style="flex:0;min-width:70px">${gXP(g)} XP</span></div>`).join('')}`;
- ks.forEach(b=>{const r=rk(b),x=xpOf(b),p=prog(b);
-  h+=`<div class="row" onclick="openB('${b}')"><span>[${rn(b,r)}] ${KID.includes(b)?'· ':''}${nm(b)}<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div></span><span class="dim" style="flex:0;min-width:70px">${x} XP</span></div>`});
- h+=`</div><div class="row"><button onclick="th()">Тема</button><button onclick="crt()">Эффект ЭЛТ</button><button onclick="un={};toast('> ЗАКРЫТЫЕ ВЕТКИ ЗАБЛОКИРОВАНЫ');render()">Заблокировать</button></div>`;$('s').innerHTML=h}
-function th(){const c=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');st.th=c=='dark'?'light':'dark';document.documentElement.dataset.theme=st.th;save()}
-function crt(){st.crt=st.crt?0:1;document.body.classList.toggle('crt',!!st.crt);save()}
+const hello=()=>{const h=new Date().getHours();return h<5?'Доброй ночи':h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер'};
+const yrs=a=>a+' '+(a%10==1&&a%100!=11?'год':a%10>=2&&a%10<=4&&(a%100<10||a%100>=20)?'года':'лет');
+const rcol=r=>'var(--r'+Math.max(0,Math.min(5,r))+')';
+const rbB=b=>{const r=rk(b),k=b=='pl'?Math.min(5,Math.floor(r*5/topR('pl'))):r;return `<b style="color:${rcol(k)}">[${rn(b,r)}]</b>`};
+const rbF=F=>{const r=Math.min(5,Math.floor(F));return `<b style="color:${rcol(r)}">${RN[r]} · ${RNN[r]}</b>`};
+const rbBig=F=>{const r=Math.min(5,Math.floor(F));return `<div style="color:${rcol(r)}"><span style="font:400 34px/1 'VT323',monospace">${RN[r]}</span> <span style="font-size:13px">${RNN[r]}</span></div>`};
+const stars=x=>x>=5000?' '+'★'.repeat(Math.min(5,Math.floor((x-3000)/2000)))+(x>=13000?'×'+Math.floor((x-3000)/2000):''):'';
+const bar=p=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
+const LKN={pin:'Партнёр',pinh:'Здоровье и психика'};
+function lockAll(){un={};if(cur&&LKG[cur])closeS();toast('> СЕКРЕТНЫЕ ВЕТКИ ЗАКРЫТЫ');render()}
+function nextUp(){let q=null;Object.keys(B).forEach(b=>{if(b=='pl'||lk(b)||rk(b)>=5)return;const n=TH[rk(b)+1]-xpOf(b);if(!q||n<q.n)q={b,n}});return q}
+/* СТАТУС: приветствие, герой, сегодня, три сферы, ближайшее повышение */
+function vS(){const L=lvl(),t=tot(),a=40*(L-1)**2,n=40*L*L,p=st.prof||{},ag=age(),td=day(),dl=dayList(),cnt=dl.filter(([b,i])=>doneT(b,i)).length,q=nextUp(),opn=Object.keys(un).filter(k=>un[k]);
+ let h=`<div class="pn"><h1>${hello()}${p.name?', '+esc(p.name):''}</h1><span class="dim">${new Date().toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'})}${ag!=null?' · '+yrs(ag):''}</span></div>`;
+ h+=`<div class="pn"><div class="row" style="margin:0"><span><b>УРОВЕНЬ ${L}</b> · ${PL[Math.min(9,Math.floor((L-1)/2))]}</span><button onclick="help()" style="flex:0;min-width:44px" aria-label="Как устроена прокачка">?</button></div>${bar((t-a)/(n-a)*100)}<span class="dim">До уровня ${L+1}: ещё ${n-t} XP. Уровень общий и растёт от любых записей.</span></div>`;
+ h+=`<div class="pn"><b>СЕГОДНЯ</b><br>Задание дня: ${cnt} из ${dl.length}${dl.length&&cnt==dl.length?' ✓':''}${bar(dl.length?cnt/dl.length*100:0)}Серия: ${shown()} дн. · Заморозок: ${fzLeft()}`;
+ if(gap()==2&&st.streak)h+=`<br><b style="color:var(--warn)">> ВЧЕРА ПРОПУЩЕНО. Закрой день заморозкой или больным днём до первой записи сегодня, иначе серия начнётся заново.</b><div class="row"><button onclick="covers(0)">Заморозка</button><button onclick="covers(1)">Больной день</button></div>`;
+ h+=`<div class="row"><button onclick="go('z')">${dl.length&&cnt==dl.length?'Открыть задания':'Продолжить задания'}</button></div></div>`;
+ h+=advPanel();
+ h+=`<div class="grid">`+CL.map(([cn,it],ci)=>{const F=cF(it);return `<div class="pn sc" style="color:var(--c${ci});margin:0" onclick="st.op=st.op||{};st.op['${cn}']=1;st.vm='a';saveLocal();go('n')"><b>${cn.split(' ')[0]}</b>${rbBig(F)}${bar((F%1)*100)}</div>`}).join('')+`</div>`;
+ const topA=advise().slice(0,3).map(x=>x.id);
+ if(q&&!topA.includes('near'+q.b)&&!topA.includes('exam'+q.b))h+=`<div class="pn"><b>БЛИЖЕ ВСЕГО К ПОВЫШЕНИЮ</b><br>${esc(B[q.b].n)} ${rbB(q.b)}: ${q.n>0?'ещё '+q.n+' XP, потом экзамен':'можно сдавать экзамен'} на ${RN[rk(q.b)+1]} · ${RNN[rk(q.b)+1]}<div class="row"><button onclick="openB('${q.b}')">Открыть ветку</button></div></div>`;
+ if(opn.length)h+=`<div class="row"><button onclick="lockAll()">🔒 Закрыть секретные ветки (открыто: ${opn.map(k=>LKN[k]).join(', ')})</button></div>`;
+ $('s').innerHTML=h}
+function help(){SH.innerHTML=`<div class="box"><h2>КАК УСТРОЕНА ПРОКАЧКА</h2>
+ <p><b>1. Записи дают XP</b> (очки опыта). У каждого задания своя цена. В ветках фокуса недели XP вдвое больше. Одна ветка даёт не больше ${CAP} XP в день.</p>
+ <p><b>2. Уровень героя</b> общий: растёт от любого XP. От уровня зависит титул: ${PL.join(' → ')}.</p>
+ <p><b>3. Ранг</b> у каждой ветки свой и показывает мастерство в этой сфере:</p>
+ <table class="help">${RN.map((r,k)=>`<tr><td><b style="color:${rcol(k)}">${r} · ${RNN[k]}</b></td><td>от ${TH[k]} XP</td></tr>`).join('')}</table>
+ <p><b>4. Экзамен.</b> Когда XP ветки дошёл до следующего ранга, открывается экзамен: выполни условие ветки и опиши доказательство. Ранг повышается только после экзамена.</p>
+ <p><b>5. Продвинутые задания</b> 🔒 открываются, когда ветка доходит до нужного ранга.</p>
+ <p><b>6. Звёзды мастерства</b> ★: после ранга S за каждые 2000 XP в ветке.</p>
+ <p><b>7. Пауэрлифтинг</b> считается иначе: его ранг — спортивный разряд по сумме приседа, жима и тяги, по нормам Минспорта для твоего пола и веса. Официальный разряд (с соревнований) отмечается отдельно, с документом.</p>
+ <p><b>8. Серия</b> — дни подряд с записями. Пропустил день: закрой его заморозкой (2 в месяц) или больным днём.</p>
+ <p><b>9. Стартовые ранги</b> из анкеты: не выше C · Практик. B, A и S берутся только экзаменами.</p>
+ <button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
+const THEMES=[['','Авто'],['term','Терминал'],['amber','Янтарь'],['system','Система'],['light','Светлая']];
+function setTh(v){st.th=v;if(v)document.documentElement.dataset.theme=v;else delete document.documentElement.dataset.theme;save();vD()}
+function crt(){st.crt=st.crt?0:1;document.body.classList.toggle('crt',!!st.crt);save();if(tab=='d')vD()}
 /* ДРЕВО */
 let vi=0,pd0=0;const pts=new Map();
 function sv(){const w=vb[2];vb[3]=w*SV.clientHeight/Math.max(1,SV.clientWidth);const cx=Math.max(0,Math.min(660,vb[0]+w/2)),cy=Math.max(0,Math.min(660,vb[1]+vb[3]/2));vb[0]=cx-w/2;vb[1]=cy-vb[3]/2;SV.setAttribute('viewBox',vb.join(' '))}
@@ -186,12 +243,12 @@ function closeS(){SH.style.display='none';cur=''}
 function openB(b){cur=b;const o=B[b];
  if(lk(b)){pinSheet(b);return}
  if(b=='pl')return openPL();const r=rk(b),x=xpOf(b),nx=TH[r+1],p=r==5?100:(x-TH[r])/(nx-TH[r])*100;
- let h=`<div class="box"><h2>[${RN[r]}${r==5&&x>=3000?'+'+Math.floor((x-3000)/2000):''}] ${o.n}${st.foc.includes(b)?' · ФОКУС x2':''}</h2><div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>${x} XP${r<5?' из '+nx:''}`;
- h+=b=='ag'?agPanel():b=='ft'?weekPanel()+ftPanel():b=='hb'?hbPanel():'';let gd=0,gh=0;(b=='ft'?ordFt():o.t.map((x,k)=>k)).forEach(i=>{const T=o.t[i];if(T[5]&&T[5]!=gd){gd=T[5];h+='<b>'+DN[gd]+(gd==pd()?' · СЕГОДНЯ':'')+'</b>'}if(T[9]&&!gh){gh=1;h+='<b>ГТО · 10 СТУПЕНЬ, 30-34 ГОДА</b>'}if((b=='ag'?(T[4]||0)>agS():(T[4]||0)>r)||(T[8]&&!st.ortho))h+=`<div class="row dim"><span>ЧЕРТЁЖ: ${T[0]}</span>${T[8]&&!st.ortho?'нужна отметка: ортопед разрешил':b=='ag'?'откроется на этапе '+T[4]:'откроется с ранга '+RN[T[4]]}</div>`;
+ let h=`<div class="box"><h2>${rbB(b)}${stars(x)} ${o.n}${st.foc.includes(b)?' · ФОКУС x2':''}</h2><div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>${x} XP${r<5?' · до экзамена на '+RN[r+1]+' · '+RNN[r+1]+': '+Math.max(0,nx-x)+' XP':''}`;
+ h+=b=='ag'?agPanel():b=='ft'?weekPanel()+ftPanel():b=='hb'?hbPanel():'';let gd=0,gh=0;(b=='ft'?ordFt():o.t.map((x,k)=>k)).forEach(i=>{const T=o.t[i];if(T[5]&&T[5]!=gd){gd=T[5];h+='<b>'+DN[gd]+(gd==pd()?' · СЕГОДНЯ':'')+'</b>'}if(T[9]&&!gh){gh=1;h+='<b>ГТО · 10 СТУПЕНЬ (мужчины 30–34 года)</b>'}if((b=='ag'?(T[4]||0)>agS():(T[4]||0)>r)||(T[8]&&!st.ortho))h+=`<div class="row dim"><span>🔒 ${T[0]}</span>${T[8]&&!st.ortho?'нужна отметка: врач разрешил нагрузку на плечо':b=='ag'?'откроется на этапе ловкости '+T[4]:'продвинутое задание: откроется с ранга '+RN[T[4]]+' · '+RNN[T[4]]}</div>`;
   else if(b=='ft'&&!T[9])h+=setRow(b,i,T);else h+=`<div class="row"><span>${T[0]}${T[6]?' <span class="dim">'+T[6]+'</span>':''}${T[3]=='d'?' (меньше лучше)':''}${T[7]?gl(b,i,T):''}</span><input id="v${i}" type="${T[10]||T[12]?'text':'number'}" inputmode="decimal" placeholder="${T[1]}"><button onclick="add('${b}',${i},pv($('v${i}').value))">+${T[2]}</button></div>`});
- if(r<5){h+=`<div class="pn"><b>ЭКЗАМЕН на ранг ${RN[r+1]}</b><br>${o.e}<br>`;
+ if(r<5){h+=`<div class="pn"><b>ЭКЗАМЕН на ранг ${RN[r+1]} · ${RNN[r+1]}</b><br>${o.e}<br>`;
   h+=x>=nx?`<input id="pf" placeholder="доказательство: ссылка или описание" style="width:100%;margin:6px 0"><button onclick="exam()">Сдать экзамен</button>`:`<span class="dim">Нужно ещё ${nx-x} XP.</span>`;h+='</div>'}
- else h+=`<p>> МАКСИМАЛЬНЫЙ РАНГ. Дальше идёт престиж: +1 за каждые 2000 XP.</p>`;
+ else h+=`<p>> МАКСИМАЛЬНЫЙ РАНГ: S · ЛЕГЕНДА. Дальше копятся звёзды мастерства: ★ за каждые 2000 XP в ветке.</p>`;
  SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
 function exam(){const v=$('pf').value.trim();if(v.length<5)return toast('> ОПИШИ ДОКАЗАТЕЛЬСТВО (минимум 5 символов)');
  st.r[cur]=rk(cur)+1;st.ex.push({t:Date.now(),b:cur,r:st.r[cur],p:v});save();toast('> РАНГ ПОВЫШЕН: '+B[cur].n+' → '+RN[st.r[cur]],1);openB(cur);render()}
@@ -253,9 +310,9 @@ function pinForgot(b){const k=LKG[b],e=$('fg');if(!rs2){rs2=1;e.textContent='Т�
 document.addEventListener('visibilitychange',()=>{if(document.hidden){un={};if(cur&&LKG[cur])closeS();render()}else pull()});
 /* ГРУППЫ НА КАРТЕ */
 let gx='';
-const tl=b=>lk(b)?'ЗАСЕКРЕЧЕНО':(B[b].s||B[b].n);
+const tl=b=>lk(b)?'🔒':(B[b].s||B[b].n);
 const gF=g=>GR[g].c.reduce((s,b)=>s+(rk(b)+(rk(b)<topR(b)?Math.max(0,Math.min(1,prog(b)/100)):0))*5/topR(b),0)/GR[g].c.length,gRank=g=>RN[Math.min(5,Math.floor(gF(g)))],gPct=g=>(gF(g)%1)*100,gXP=g=>GR[g].c.reduce((a,b)=>a+xpOf(b),0);
-const hbPanel=()=>`<div class="pn"><b>РЕЕСТР ДОПУСКОВ</b><br><span class="dim">Отметки врачей: из них берут данные другие ветки. Это учёт, а не медицинская рекомендация.</span><div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('hb')">Уролог разрешил</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('hb')">Ортопед разрешил</button></div></div>`;
+const hbPanel=()=>`<div class="pn"><b>РЕЕСТР ДОПУСКОВ</b><br><span class="dim">Отметки врачей: из них берут данные другие ветки. Это учёт, а не медицинская рекомендация.</span><div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('hb')">Врач разрешил прыжки</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('hb')">Врач разрешил нагрузку на плечо</button></div></div>`;
 function brSVG(b,a,col,s0,pr,lr,fs){const ca=Math.cos(a),sa=Math.sin(a),r0=rk(b),NN=topR(b)+1,sg=(240-s0)/(NN-1);let s=`<g data-b="${b}" style="color:${col};cursor:pointer">`;
  for(let k=0;k<NN;k++){const x=330+ca*(s0+sg*k),y=330+sa*(s0+sg*k),on=k<=r0,nx=k==r0+1;
   s+=`<line x1="${pr[0]}" y1="${pr[1]}" x2="${x}" y2="${y}" stroke="currentColor" stroke-width="${on?2.5:1}" opacity="${on?1:.3}"/><rect x="${x-8}" y="${y-8}" width="16" height="16" transform="rotate(45 ${x} ${y})" fill="${on?'currentColor':'var(--bg)'}" stroke="currentColor" opacity="${on||nx?1:.35}"${nx?' class="pu"':''}/>`;pr=[x,y]}
@@ -277,8 +334,8 @@ function openG(g){if(g=='sp')return openSport();cur='';const c=GR[g].c;let h=`<d
 const SS={},sk=(b,i)=>b+i,agg=(a,T)=>T[5]||T[1]=='кг'?Math.max(0,...a.map(e=>e.v)):sum(a,'v');
 const sum2=a=>{const v=Math.round(a.reduce((s,x)=>s+x[0]*x[1],0)),m=a.reduce((p,x)=>x[0]>p[0]?x:p,a[0]);return a.length+' подх. · объём '+v+' кг · макс '+m[0]+'×'+m[1]};
 const lastS=(b,i)=>{const e=[...st.log].reverse().find(e=>e.b==b&&e.i==i&&e.sets);return e?`<br><span class="dim">Прошлый раз (${day(new Date(e.t)).slice(5)}): ${e.sets.map(s=>s[0]+'×'+s[1]).join(', ')}</span>`:''};
-const setRow=(b,i,T)=>`<div class="pn"><b>${T[0]}</b> <span class="dim">${T[6]||''}</span>${wkS(b,i)}<div id="sb${sk(b,i)}">${sbHTML(b,i)}</div></div>`;
-function sbHTML(b,i){const k=sk(b,i),a=SS[k]||[],l=a[a.length-1]||[b=='pl'?'':0,''];
+const setRow=(b,i,T)=>`<div class="pn"><b>${T[0]}</b> <span class="dim">${T[6]||''}</span>${(o=>o?`<br><span style="color:${o.t=='up'?'var(--r5)':'var(--c1)'}">› ${o.txt}</span>`:'')(ovl(b,i))}${wkS(b,i)}<div id="sb${sk(b,i)}">${sbHTML(b,i)}</div></div>`;
+function sbHTML(b,i){const k=sk(b,i),a=SS[k]||[],l=a[a.length-1]||[(o=>o?fmtN(o.w):'')(ovl(b,i)),''];
  let h=a.map((s,j)=>`<div class="row"><span>${j+1}) ${s[0]} × ${s[1]}</span><button onclick="sd('${b}',${i},${j})">×</button></div>`).join('');
  h+=`<div class="row"><input id="w${k}" type="number" inputmode="decimal" placeholder="вес" value="${l[0]}"><input id="n${k}" type="number" inputmode="numeric" placeholder="повт" value="${l[1]}" style="width:64px"><input id="c${k}" type="number" inputmode="numeric" placeholder="подх" value="1" style="width:64px"><button onclick="sa('${b}',${i})">+ подход</button></div>`;
  if(a.length)h+=`<div class="row"><span class="dim">${sum2(a)}</span><button onclick="sg('${b}',${i})">Записать +${B[b].t[i][2]}</button></div>`;return h}
@@ -293,36 +350,138 @@ const pv=s=>{s=String(s).trim().replace(',','.');if(!s)return NaN;if(s.includes(
 const fm=(v,T)=>T[10]?(v>=60?Math.floor(v/60)+':'+String(Math.round(v%60)).padStart(2,'0'):v+' с'):v;
 const gtoBest=(b,i)=>{const T=B[b].t[i],a=st.log.filter(e=>e.b==b&&e.i==i).map(e=>e.v);return a.length?(T[3]=='d'?Math.min(...a):Math.max(...a)):null};
 const gtoLv=(T,v)=>{if(v==null)return 0;const n=T[7],d=T[3]=='d';return([2,1,0].find(k=>d?v<=n[k]:v>=n[k])+1)||0};
-const gl=(b,i,T)=>{const v=gtoBest(b,i),n=T[7];return`<br><span class="dim">Б ${fm(n[0],T)} · С ${fm(n[1],T)} · З ${fm(n[2],T)}${v==null?'':' · лучший '+fm(v,T)+': '+['нет знака','бронза','серебро','золото'][gtoLv(T,v)]}</span>`};
+const gl=(b,i,T)=>{if(!gtoOK())return '<br><span class="dim">Нормы ГТО для твоего пола и возраста пока не добавлены</span>';const v=gtoBest(b,i),n=T[7];return`<br><span class="dim">Б ${fm(n[0],T)} · С ${fm(n[1],T)} · З ${fm(n[2],T)}${v==null?'':' · лучший '+fm(v,T)+': '+['нет знака','бронза','серебро','золото'][gtoLv(T,v)]}</span>`};
 const gtoBadge=()=>{const cs={};Object.keys(B).forEach(b=>B[b].t.forEach((T,i)=>{if(T[9]){const l=gtoLv(T,gtoBest(b,i));cs[T[11]]=Math.max(cs[T[11]]||0,l)}}));const ok=(L,n)=>'refs'.split('').every(c=>(cs[c]||0)>=L)&&'refsva'.split('').filter(c=>(cs[c]||0)>=L).length>=n;return ok(3,6)?3:ok(2,5)?2:ok(1,5)?1:0};
-const ftPanel=()=>`<div class="pn"><b>ГТО · ПЛЕЧО</b><br><span class="dim">В твоей программе исключены висы, жимы над головой и броски. Помеченные упражнения откроются после отметки врача.</span><div class="row"><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ft')">Ортопед разрешил</button></div></div>`;
+const ftPanel=()=>`<div class="pn"><b>ГТО · ПЛЕЧО</b><br><span class="dim">В твоей программе исключены висы, жимы над головой и броски. Помеченные упражнения откроются после отметки врача.</span><div class="row"><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ft')">Врач разрешил нагрузку на плечо</button></div></div>`;
 /* СПОРТ: ОБЩАЯ ВЕТКА */
 const SUB=['pl','ft','ag'],SPT=[330+Math.cos(-73.3*Math.PI/180)*76,330+Math.sin(-73.3*Math.PI/180)*76];
 const sportXP=()=>SUB.reduce((a,b)=>a+xpOf(b),0),sportF=()=>SUB.reduce((s,b)=>s+(rk(b)+(rk(b)<topR(b)?Math.max(0,Math.min(1,prog(b)/100)):0))*5/topR(b),0)/3,sportRank=()=>RN[Math.min(5,Math.floor(sportF()))],sportPct=()=>(sportF()%1)*100;
 function sportNode(){return `<g data-g="1" style="color:var(--c0);cursor:pointer"><line x1="330" y1="330" x2="${SPT[0]}" y2="${SPT[1]}" stroke="currentColor" stroke-width="2.5"/><rect x="${SPT[0]-12}" y="${SPT[1]-12}" width="24" height="24" transform="rotate(45 ${SPT[0]} ${SPT[1]})" fill="var(--bg)" stroke="currentColor" stroke-width="2"/><text x="${SPT[0]}" y="${SPT[1]}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="currentColor" stroke="none">${sportRank()}</text><text x="${SPT[0]+20}" y="${SPT[1]-14}" font-size="12" fill="currentColor" stroke="none">СПОРТ</text></g>`}
-function openSport(){cur='';let h=`<div class="box"><h2>[${sportRank()}] Спорт</h2>Общий XP: ${sportXP()}. Ранг считается как средний по трём подветкам.<br>ГТО (10 ступень): <b>${['пока нет знака','бронза','серебро','золото'][gtoBadge()]}</b> по твоим лучшим результатам. Официальный знак выдаётся только после сдачи в центре тестирования.<div class="bar"><i style="width:${sportPct()}%"></i></div>`;
+function openSport(){cur='';let h=`<div class="box"><h2>[${sportRank()}] Спорт</h2>Общий XP: ${sportXP()}. Ранг считается как средний по трём подветкам.<br>ГТО (10 ступень): <b>${gtoOK()?['пока нет знака','бронза','серебро','золото'][gtoBadge()]:'нормы для твоей группы пока не добавлены'}</b>${gtoOK()?' по твоим лучшим результатам':''}. Официальный знак выдаётся только после сдачи в центре тестирования.<div class="bar"><i style="width:${sportPct()}%"></i></div>`;
  SUB.forEach(b=>{const r=rk(b);h+=`<div class="row"><span>[${rn(b,r)}] ${B[b].n}<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog(b)))}%"></i></div></span><button onclick="openB('${b}')">Открыть</button></div>`});
  SH.innerHTML=h+`<p class="dim">Подветки: Пауэрлифтинг (сумма трёх упражнений и разряды), Фитнес (программа по дням), Ловкость (гибкость и прыжки, открывается этапами).</p><button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
 /* ПАУЭРЛИФТИНГ И ЛОВКОСТЬ */
 function setBase(){st.base={0:+$('bs0').value||0,1:+$('bs1').value||0,2:+$('bs2').value||0};st.bw=+$('bw').value||83;save();openPL();render()}
 function offc(){const k=+$('ofs').value,p=$('ofp').value.trim();if(p.length<(k>=8?15:5))return toast(k>=8?'> ДЛЯ КМС И ВЫШЕ НУЖНО ПОДТВЕРЖДЕНИЕ (МИНИМУМ 15 СИМВОЛОВ)':'> ОПИШИ ПОДТВЕРЖДЕНИЕ');st.off=k;st.ex.push({t:Date.now(),b:'pl',r:k,p});save();toast('> ОФИЦИАЛЬНЫЙ РАЗРЯД: '+B.pl.L[k],1);openPL();render()}
-function agPanel(){const c=agC(),s=agS();return `<div class="pn"><b>ЭТАП ${s} ИЗ 2</b><br>`+c.map(q=>(q[1]?'[✓] ':'[ ] ')+q[0]).join('<br>')+`<br>Этап 2: ${best(0)>=BW()*1.5?'[✓]':'[ ]'} присед от ${Math.ceil(BW()*1.5)} кг ${st.leg?'[✓]':'[ ]'} 30 с на одной ноге в полуприседе<div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('ag')">Уролог разрешил</button><button class="${st.leg?'on':''}" onclick="st.leg=!st.leg;save();openB('ag')">30 с на одной ноге</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ag')">Ортопед разрешил</button></div><span class="dim">Ориентир NSCA, не замена врача.</span></div>`}
+function agPanel(){const c=agC(),s=agS();return `<div class="pn"><b>ЭТАП ${s} ИЗ 2</b><br>`+c.map(q=>(q[1]?'[✓] ':'[ ] ')+q[0]).join('<br>')+`<br>Этап 2: ${best(0)>=BW()*1.5?'[✓]':'[ ]'} присед от ${Math.ceil(BW()*1.5)} кг ${st.leg?'[✓]':'[ ]'} 30 с на одной ноге в полуприседе<div class="row"><button class="${st.doc?'on':''}" onclick="st.doc=!st.doc;save();openB('ag')">Врач разрешил прыжки</button><button class="${st.leg?'on':''}" onclick="st.leg=!st.leg;save();openB('ag')">30 с на одной ноге</button><button class="${st.ortho?'on':''}" onclick="st.ortho=!st.ortho;save();openB('ag')">Врач разрешил нагрузку на плечо</button></div><span class="dim">Ориентир NSCA, не замена врача.</span></div>`}
 function openPL(){cur='pl';const o=B.pl,L=o.L,r=plLv(),tt=plTot(),nx=o.TT[r+1],of=st.off==null?-1:st.off,bs=st.base||{};
- let h=`<div class="box"><h2>[${L[r]}] Пауэрлифтинг</h2>Уровень по весам: <b>${L[r]}</b><br>Сумма: ${tt} кг (присед ${best(0)}, жим ${best(1)}, тяга ${best(2)}). Расчёт по формуле Эпли из веса и повторов.<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog('pl')))}%"></i></div>${nx?'До «'+L[r+1]+'»: '+Math.round((nx-tt)*2)/2+' кг':'Максимум таблицы'}<br>Официальный разряд: <b>${of>=0?L[of]:'нет'}</b><br><span class="dim">Нормы: классическое троеборье, мужчины до 83 кг, таблица ФПР 2026. Сверь с действующим приказом.</span><div class="pn"><b>СТАРТ</b> <span class="dim">(максимумы и вес тела, кг)</span><div class="row"><input id="bs0" type="number" placeholder="присед" value="${bs[0]||''}"><input id="bs1" type="number" placeholder="жим" value="${bs[1]||''}"><input id="bs2" type="number" placeholder="тяга" value="${bs[2]||''}"><input id="bw" type="number" placeholder="вес" value="${st.bw||83}"><button onclick="setBase()">ОК</button></div></div>`;
+ let h=`<div class="box"><h2>${rbB('pl')} Пауэрлифтинг</h2>Уровень по весам: <b>${L[r]}</b><br>Сумма: ${tt} кг (присед ${best(0)}, жим ${best(1)}, тяга ${best(2)}). Расчёт по формуле Эпли из веса и повторов.<div class="bar"><i style="width:${Math.max(0,Math.min(100,prog('pl')))}%"></i></div>${nx?'До «'+L[r+1]+'»: '+Math.round((nx-tt)*2)/2+' кг':'Максимум таблицы'}<br>Официальный разряд: <b>${of>=0?L[of]:'нет'}</b><br><span class="dim">Нормы: классическое троеборье, ${SEX()=='f'?'женщины':'мужчины'}, категория ${B.pl.cls} кг (по весу из профиля). Классификация Минспорта от 09.04.2026 № 299. «Обыватель» и «Начинающий» — ориентир приложения, не разряды.</span><div class="pn"><b>СТАРТ</b> <span class="dim">(максимумы и вес тела, кг)</span><div class="row"><input id="bs0" type="number" placeholder="присед" value="${bs[0]||''}"><input id="bs1" type="number" placeholder="жим" value="${bs[1]||''}"><input id="bs2" type="number" placeholder="тяга" value="${bs[2]||''}"><input id="bw" type="number" placeholder="вес" value="${st.bw||83}"><button onclick="setBase()">ОК</button></div></div>`;
  o.t.forEach((T,i)=>{h+=setRow('pl',i,T)});
  h+=`<div class="pn"><b>ОФИЦИАЛЬНЫЙ РАЗРЯД</b><br><span class="dim">Только за выступление на соревновании. Для КМС и выше укажи ссылку на протокол или опиши документ.</span><div class="row"><select id="ofs">${L.map((n,k)=>k>1?`<option value="${k}">${n}</option>`:'').join('')}</select><input id="ofp" placeholder="подтверждение" style="flex:1"><button onclick="offc()">Подтвердить</button></div></div>`;
  SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
 /* ЗАДАНИЯ */
-function tf(b){if(lk(b))return toast('> Сначала открой ветку PIN-кодом');const i=st.foc.indexOf(b);if(i>=0)st.foc.splice(i,1);else if(st.foc.length<3)st.foc.push(b);else toast('> МАКСИМУМ 3 ВЕТКИ');save();vZ()}
-function vZ(){let h=`<div class="pn"><h1>[СИСТЕМА] ЗАДАНИЯ</h1>`;
- if(st.foc.length<3){h+=`Выбери 3 ветки в фокус недели (XP x2). Выбрано: ${st.foc.length}<div class="chips" style="margin-top:8px">`+Object.keys(B).map(b=>`<button class="${st.foc.includes(b)?'on':''}" onclick="tf('${b}')">${nm(b)}</button>`).join('')+'</div>'}
- else h+=`Фокус недели: ${st.foc.map(nm).join(', ')} <button onclick="st.foc=[];save();vZ()">Сменить</button>`;
- h+='</div>';let L=[['sl',0],['vh',0]];
- st.foc.forEach(b=>B[b].t.forEach((T,i)=>{if(!lk(b)&&b!='pl'&&b!='ft'&&!T[9]&&(!T[5]||T[5]==pd())&&(b=='ag'?(T[4]||0)<=agS():(T[4]||0)<=rk(b))&&!L.some(q=>q[0]==b&&q[1]==i))L.push([b,i])}));L=L.slice(0,5);const d=day();
- h+=`<div class="pn"><b>НА СЕГОДНЯ (до 5)</b>`;
- L.forEach(([b,i])=>{const T=B[b].t[i],dn=st.log.some(e=>e.b==b&&e.i==i&&day(new Date(e.t))==d);
-  h+=`<div class="row"><span>${dn?'[✓] ':''}${T[0]}<br><span class="dim">${B[b].n}</span></span>${b=='ft'?`<button onclick="openB('ft')">Подходы</button>`:`<input id="d${b}${i}" type="number" inputmode="decimal" placeholder="${T[1]}"><button onclick="add('${b}',${i},+$('d${b}${i}').value)">+${T[2]*(st.foc.includes(b)?2:1)}</button>`}</div>`});
- $('z').innerHTML=h+(pd()?'<button onclick="openB(\'ft\')">Тренировка: '+DN[pd()]+'</button> ':'')+(st.foc.includes('pl')?'<button onclick="openB(\'pl\')">Пауэрлифтинг: записать подход</button>':'')+'</div><p class="dim">Остальные задания открываются в ветке на вкладке «Навыки». Дневной лимит: '+CAP+' XP на ветку.</p>'}
+/* ЗАДАНИЯ: база + фокус недели + тренировка дня; быстрая отметка */
+const sph=b=>{let r=0;CL.forEach(([cn,it],ci)=>{if(it.some(id=>id==b||(GR[id]&&GR[id].c.includes(b))))r=ci});return r};
+const isOne=T=>T[1]=='раз'||T[1]=='заказ';
+function dayList(){let L=[['sl',0],['vh',0]].filter(([b])=>!lk(b));
+ st.foc.forEach(b=>B[b].t.forEach((T,i)=>{if(!lk(b)&&b!='pl'&&b!='ft'&&!T[9]&&(!T[5]||T[5]==pd())&&(b=='ag'?(T[4]||0)<=agS():(T[4]||0)<=rk(b))&&!(T[8]&&!st.ortho)&&!L.some(q=>q[0]==b&&q[1]==i))L.push([b,i])}));return L.slice(0,5)}
+const doneT=(b,i)=>{const d=day();return st.log.some(e=>e.b==b&&e.i==i&&!e.m&&day(new Date(e.t))==d)};
+const lastV=(b,i)=>{const e=[...st.log].reverse().find(e=>e.b==b&&e.i==i&&!e.m&&!e.demo);return e?e.v:null};
+function card(b,i){const T=B[b].t[i],dn=doneT(b,i),lv=lastV(b,i),x=T[2]*(st.foc.includes(b)?2:1),left=Math.max(0,CAP-capUsed(b));
+ return `<div class="rw" style="border-left:3px solid var(--c${sph(b)});${dn?'opacity:.55':''}" onclick="${isOne(T)?`quick('${b}',${i})`:`ask('${b}',${i})`}">
+ <span style="font-size:20px;width:22px">${dn?'✓':'□'}</span><span class="n">${esc(T[0])}<br><span class="dim" style="font-size:13px">${esc(B[b].n)}${lv!=null?' · прошлый раз: '+lv+' '+T[1]:''}${left<CAP?' · лимит ветки: ещё '+left+' XP':''}</span></span><b style="color:var(--c${sph(b)})">+${Math.min(x,left)}</b></div>`}
+function quick(b,i){add(b,i,1)}
+function ask(b,i){const T=B[b].t[i],lv=lastV(b,i),sc=T[1]=='балл';cur='';
+ let h=`<div class="box"><h2>${esc(T[0])}</h2><span class="dim">${esc(B[b].n)} · ${T[3]=='d'?'меньше — лучше · ':''}единица: ${T[1]}</span><br>`;
+ if(sc)h+=`<div class="row">${[1,2,3,4,5].map(k=>`<button style="flex:1;font-size:20px" onclick="closeS();add('${b}',${i},${k})">${k}</button>`).join('')}</div><span class="dim">1 — очень плохо, 5 — отлично</span>`;
+ else h+=`<input id="qv" type="number" inputmode="decimal" placeholder="${T[1]}" value="${lv!=null?lv:''}" style="width:100%;font-size:24px;margin:8px 0" onkeydown="if(event.key=='Enter')qGo('${b}',${i})">${lv!=null?`<span class="dim">Подставлено прошлое значение. Поменяй, если сегодня другое.</span>`:''}<div class="row"><button class="on" style="flex:1" onclick="qGo('${b}',${i})">Записать +${T[2]*(st.foc.includes(b)?2:1)} XP</button></div>`;
+ SH.innerHTML=h+`<button onclick="closeS()">Отмена</button></div>`;SH.style.display='block';if(!sc)setTimeout(()=>{const q=$('qv');if(q){q.focus();q.select()}},50)}
+function qGo(b,i){const raw=$('qv').value.trim(),v=pv(raw);if(raw===''||!isFinite(v)||v<0)return toast('> ВВЕДИ ЧИСЛО');closeS();add(b,i,v)}
+/* ФОКУС НЕДЕЛИ: отдельное окно, раз в неделю предлагается само */
+function tf(b){if(lk(b))return toast('> Сначала открой ветку PIN-кодом');const i=st.foc.indexOf(b);if(i>=0)st.foc.splice(i,1);else if(st.foc.length<3)st.foc.push(b);else return toast('> МАКСИМУМ 3 ВЕТКИ. СНИМИ ОДНУ');save();focS()}
+function focS(){cur='';let h=`<div class="box"><h2>ФОКУС НЕДЕЛИ</h2><span class="dim">Выбери 3 ветки, которые качаешь на этой неделе: XP в них ×2, а их задания попадут в список на сегодня. Выбрано: ${st.foc.length} из 3.</span>`;
+ CL.forEach(([cn,it],ci)=>{h+=`<br><b style="color:var(--c${ci})">${cn}</b><div class="chips" style="margin:6px 0">`+it.flatMap(id=>GR[id]?GR[id].c:[id]).map(b=>`<button class="${st.foc.includes(b)?'on':''}" style="${st.foc.includes(b)?'background:var(--c'+ci+');border-color:var(--c'+ci+')':'color:var(--c'+ci+');border-color:var(--c'+ci+')'}" onclick="tf('${b}')">${nm(b)}</button>`).join('')+`</div>`});
+ SH.innerHTML=h+`<div class="row"><button class="on" onclick="st.fpr=st.fw;save();closeS();render()">Готово</button></div></div>`;SH.style.display='block'}
+function vZ(){const L=dayList(),dn=L.filter(([b,i])=>doneT(b,i)).length,all=L.length&&dn==L.length,td=day(),xp=st.log.filter(e=>day(new Date(e.t))==td).reduce((a,e)=>a+e.x,0);
+ let h=`<div class="pn"><h1>[СИСТЕМА] ЗАДАНИЕ ДНЯ</h1>${all?'<b style="color:var(--r5)">> ЗАДАНИЕ ДНЯ ВЫПОЛНЕНО. Можно отдыхать или качать другие ветки на вкладке «Навыки».</b>':`Выполнено ${dn} из ${L.length}`} · сегодня +${xp} XP${bar(L.length?dn/L.length*100:0)}</div>`;
+ h+=`<div class="pn"><div class="row" style="margin:0"><span>${st.foc.length?'<b>Фокус недели</b> (XP ×2): '+st.foc.map(b=>`<span style="color:var(--c${sph(b)})">${nm(b)}</span>`).join(', '):'<b>Фокус недели не выбран.</b> Выбери 3 ветки, чтобы получить больше заданий и XP ×2.'}</span><button onclick="focS()" style="flex:0">${st.foc.length?'Изменить':'Выбрать'}</button></div></div>`;
+ const base=L.filter(([b])=>['sl','vh'].includes(b)&&!st.foc.includes(b)),fo=L.filter(q=>!base.includes(q));
+ if(base.length)h+=`<div class="pn"><b>БАЗА</b> <span class="dim">каждый день</span>${base.map(([b,i])=>card(b,i)).join('')}</div>`;
+ if(fo.length)h+=`<div class="pn"><b>ФОКУС</b>${fo.map(([b,i])=>card(b,i)).join('')}</div>`;
+ const pdn=pd();if(pdn||st.foc.includes('pl'))h+=`<div class="pn"><b>ТРЕНИРОВКА</b>${pdn?`<div class="row"><span>${DN[pdn]}</span><button onclick="openB('ft')">Открыть программу</button></div>`:''}${st.foc.includes('pl')?`<div class="row"><span>Пауэрлифтинг: присед, жим, тяга</span><button onclick="openB('pl')">Записать подход</button></div>`:''}</div>`;
+ h+=`<p class="dim">Нажми на задание, чтобы отметить. «Раз» отмечается сразу, для чисел откроется ввод. Остальные задания — в ветках на вкладке «Навыки». Одна ветка даёт не больше ${CAP} XP в день.</p>`;
+ $('z').innerHTML=h;
+ if(!st.foc.length&&st.fpr!=st.fw&&SH.style.display!='block')focS()}
+/* СОВЕТНИК СИСТЕМЫ: подсказки считаются по записям прямо на устройстве, без внешнего ИИ. Закрытые PIN-ветки не анализируются, пока не открыты. */
+const AV=b=>!lk(b);
+const ents=(b,i,from,to)=>st.log.filter(e=>e.b==b&&(i==null||e.i==i)&&!e.m&&e.t>=from&&e.t<(to||Infinity));
+const AVGU=['ч','балл','кг','см','с','м:сс','м','очки'];
+const fmtN=v=>Math.round(v*10)/10;
+/* значение задания за период: среднее за день (для измерений внутри дня тоже среднее, для количеств — сумма за день) */
+function perVal(b,i,from,to){const T=B[b].t[i],a=ents(b,i,from,to);if(!a.length)return null;const days={};a.forEach(e=>{const d=day(new Date(e.t));(days[d]=days[d]||[]).push(e.v)});const dv=Object.values(days);
+ return{v:dv.reduce((s,x)=>s+(AVGU.includes(T[1])?x.reduce((p,q)=>p+q,0)/x.length:x.reduce((p,q)=>p+q,0)),0)/dv.length,n:dv.length,avg:1}}
+const repRange=t=>{const m=String(t||'').match(/(\d+)×(\d+)(?:–(\d+))?/);return m?{s:+m[1],lo:+m[2],hi:+(m[3]||m[2])}:null};
+/* совет по прогрессии нагрузки для упражнения с подходами */
+function ovl(b,i){const T=B[b].t[i];if(T[1]!='кг')return null;const R=repRange(T[6]);const e=[...st.log].reverse().find(e=>e.b==b&&e.i==i&&e.sets&&e.sets.length);if(!R||!e)return null;
+ const w=Math.max(...e.sets.map(s=>s[0])),top=e.sets.filter(s=>s[0]==w),reps=top.map(s=>s[1]),inc=/гантел/i.test(T[0])?1:2.5;
+ if(top.length>=R.s&&Math.min(...reps)>=R.hi)return{t:'up',w:w+inc,txt:`${w} кг пройдены во всех ${top.length} подходах по ${R.hi}+ повторов. Сегодня ${fmtN(w+inc)} кг × ${R.lo==R.hi?R.lo:R.lo+'–'+R.hi}.`};
+ if(Math.min(...reps)<R.lo)return{t:'hold',w,txt:`В прошлый раз ${w} кг было тяжело (минимум ${Math.min(...reps)} повт. при цели ${R.lo}). Оставь ${w} кг или сбрось до ${fmtN(w-inc)} кг и сделай чисто.`};
+ return{t:'keep',w,txt:`Оставь ${w} кг и добери до ${R.hi} повторов во всех ${R.s} подходах. Потом вес вырастет.`}}
+function advise(){const R=[],now=Date.now(),td=day(),W=7*DAY,add2=(id,pri,k,title,text,act)=>R.push({id,pri,k,title,text,act});
+ if(!st.prof)add2('prof',95,'plan','Заполни анкету','Без неё нормы считаются как для мужчины 83 кг, а стартовые ранги не выставлены.',['Заполнить',"onb()"]);
+ /* серия */
+ const g=gap(),hr=new Date().getHours();
+ if(g==2&&st.streak)add2('streak',100,'warn',`Серия ${st.streak} дн. под угрозой`,'Вчера нет записей. Закрой день заморозкой или больным днём до первой записи сегодня.',['Заморозить',"covers(0)"]);
+ else if(g==1&&st.streak>=2&&hr>=18)add2('streak2',88,'warn',`Серия ${st.streak} дн.: сегодня ещё нет записей`,'До конца дня хватит одного задания.',['К заданиям',"go('z')"]);
+ /* задание дня */
+ const L=dayList(),left=L.filter(([b,i])=>!doneT(b,i));
+ if(L.length&&!left.length)add2('dayok',20,'good','Задание дня выполнено','Можно отдыхать или взять что-то из веток не в фокусе.');
+ else if(left.length&&hr>=12){const one=left.find(([b,i])=>isOne(B[b].t[i]))||left[0],T=B[one[0]].t[one[1]];add2('dayleft',70,'plan',`Осталось заданий: ${left.length} из ${L.length}`,`Быстрее всего: «${T[0]}» (${B[one[0]].n}).`,['Отметить',isOne(T)?`quick('${one[0]}',${one[1]})`:`ask('${one[0]}',${one[1]})`])}
+ /* ранги и экзамены */
+ Object.keys(B).forEach(b=>{if(b=='pl'||!AV(b))return;const r=rk(b);if(r>=5)return;const x=xpOf(b),need=TH[r+1]-x;
+  if(need<=0)add2('exam'+b,90,'good',`Экзамен открыт: ${B[b].n} → ${RN[r+1]} · ${RNN[r+1]}`,`Условие: ${B[b].e}.`,['Открыть ветку',`openB('${b}')`]);
+  else if(need<=(TH[r+1]-TH[r])*.3){const ts=B[b].t.map((T,i)=>[T,i]).filter(([T])=>!T[9]&&!(T[4]>r)&&!(T[8]&&!st.ortho)&&T[1]!='кг'),bt=ts.sort((p,q)=>q[0][2]-p[0][2])[0];
+   if(bt){const xx=bt[0][2]*(st.foc.includes(b)?2:1);add2('near'+b,60,'plan',`${B[b].n}: до экзамена ${need} XP`,`Это примерно ${Math.ceil(need/xx)} × «${bt[0][0]}» (+${xx} XP).${st.foc.includes(b)?'':' В фокусе недели вышло бы вдвое быстрее.'}`,['Открыть ветку',`openB('${b}')`])}}});
+ /* дневной лимит */
+ Object.keys(B).forEach(b=>{if(AV(b)&&capUsed(b)>=CAP)add2('cap'+b,85,'warn',`${B[b].n}: дневной лимит ${CAP} XP исчерпан`,'Новые записи в эту ветку сегодня XP не дадут. Переключись на другую.')});
+ /* уровень героя */
+ {const Lv=lvl(),n=40*Lv*Lv-tot();if(n<=25)add2('lvl',30,'plan',`До уровня ${Lv+1}: ${n} XP`,Math.floor(Lv/2)!=Math.floor((Lv-1)/2)?`Вместе с уровнем придёт титул «${PL[Math.min(9,Math.floor(Lv/2))]}».`:'Одно-два задания.')}
+ /* тренировка сегодня: прогрессия нагрузки */
+ const pdn=pd();if(pdn){const ex=B.ft.t.map((T,i)=>[T,i]).filter(([T])=>T[5]==pdn&&!T[9]&&!(T[8]&&!st.ortho)),tips=ex.map(([T,i])=>[T,ovl('ft',i)]).filter(q=>q[1]);
+  const logged=ex.filter(([T,i])=>doneT('ft',i)).length;
+  if(ex.length)add2('train',80,'plan',`Сегодня ${DN[pdn].toLowerCase()}`,(logged?`Записано ${logged} из ${ex.length} упражнений. `:'')+(tips.length?tips.slice(0,3).map(([T,o])=>`${T[0]}: ${o.t=='up'?'↑ '+fmtN(o.w)+' кг':o.t=='hold'?'= '+o.w+' кг, без спешки':'= '+o.w+' кг, добрать повторы'}`).join('; ')+'.':'Записей по упражнениям пока нет: начни с рабочих весов из программы.'),['Открыть программу',"openB('ft')"])}
+ /* регулярность тренировок за неделю */
+ {const s=twS(),n=new Set(st.log.filter(e=>e.b=='ft'&&!e.m&&e.t>=s&&B.ft.t[e.i][5]).map(e=>B.ft.t[e.i][5])).size,wd=(new Date().getDay()+6)%7;if(wd>=3&&n<2&&st.log.some(e=>e.b=='ft'))add2('trainwk',55,'warn',`На этой неделе тренировок: ${n} из 4`,'Чтобы неделя не пропала, нужно ещё хотя бы два дня программы.',['Открыть программу',"openB('ft')"])}
+ /* пауэрлифтинг */
+ {const r=plLv(),T=B.pl.TT,tt=plTot();if(tt&&T[r+1]){const d=Math.round((T[r+1]-tt)*2)/2;if(d<=Math.max(15,T[r+1]*.05))add2('pl',65,'plan',`Пауэрлифтинг: до «${B.pl.L[r+1]}» ${d} кг суммы`,`Сейчас ${tt} кг: присед ${best(0)}, жим ${best(1)}, тяга ${best(2)}. Хватит прибавки в любом из трёх движений.`,['Открыть',"openB('pl')"])}}
+ /* ловкость: что мешает открыть следующий этап */
+ {const s=agS();if(s<2){const c=s==0?agC().filter(q=>!q[1]).map(q=>q[0]):[best(0)>=BW()*1.5?'':`присед от ${Math.ceil(BW()*1.5)} кг (сейчас ${best(0)})`,st.leg?'':'30 с на одной ноге в полуприседе'].filter(Boolean);if(c.length&&c.length<=2)add2('ag',35,'plan',`Ловкость: до этапа ${s+1} осталось`,c.join('; ')+'.',['Открыть',"openB('ag')"])}}
+ /* тренды неделя к неделе */
+ const TR=[['sl',0],['sl',1],['vh',0],['vh',1],['ps',0],['ps',1],['ps',2],['nv',0]];
+ TR.forEach(([b,i])=>{if(!AV(b))return;const T=B[b].t[i],c=perVal(b,i,now-W),p=perVal(b,i,now-2*W,now-W);if(!c)return;
+  if(b=='sl'&&i==0&&c.n>=3&&c.v<7)add2('sleep',58,'warn',`Сон в среднем ${fmtN(c.v)} ч за неделю`,'Это меньше 7 часов. Попробуй сдвинуть отбой на 30 минут раньше хотя бы 4 ночи из 7.');
+  if(b=='sl'&&i==0&&c.v<7)return;if(!p||c.n<3||p.n<3||!p.v)return;const ch=(c.v-p.v)/Math.abs(p.v),dl=fmtN(c.v-p.v);if(Math.abs(ch)<.1)return;
+  if(T[3]=='n'){add2('tr'+b+i,25,'info',`${T[0]}: ${dl>0?'+':''}${dl} ${T[1]} за неделю`,`Было ${fmtN(p.v)}, стало ${fmtN(c.v)} (среднее по дням).`);return}
+  const good=T[3]=='d'?ch<0:ch>0;add2('tr'+b+i,good?40:56,good?'good':'warn',`${T[0]}: ${good?'лучше':'хуже'} на ${Math.round(Math.abs(ch)*100)}%`,`В среднем за день ${fmtN(c.v)} ${T[1]} за последние 7 дней, неделей раньше ${fmtN(p.v)}.`)});
+ /* заброшенные ветки */
+ Object.keys(B).forEach(b=>{if(!AV(b)||b=='pl')return;const a=st.log.filter(e=>e.b==b&&!e.m);if(a.length<3)return;const last=Math.max(...a.map(e=>e.t)),dd=Math.floor((now-last)/DAY);if(dd>=14)add2('old'+b,50,'warn',`${B[b].n}: ${dd} дн. без записей`,`Раньше было ${a.length} записей. Одна запись сегодня вернёт ветку в игру${st.foc.includes(b)?'':', а фокус недели даст ×2'}.`,['Открыть',`openB('${b}')`])});
+ /* ГТО: близко к следующему знаку */
+ if(gtoOK())Object.keys(B).forEach(b=>B[b].t.forEach((T,i)=>{if(!T[9])return;const v=gtoBest(b,i);if(v==null)return;const l=gtoLv(T,v);if(l>=3)return;const goal=T[7][l],d=T[3]=='d'?v-goal:goal-v;if(d>0&&d<=Math.abs(goal)*.1)add2('gto'+b+i,30,'plan',`ГТО: ${T[0].replace('ГТО · ','')} — до знака «${['бронза','серебро','золото'][l]}» совсем немного`,`Лучший результат ${fm(v,T)}, норма ${fm(goal,T)}.`,['Открыть',`openB('${b}')`])}));
+ /* допуски */
+ if(!st.ortho&&B.ft.t.some(T=>T[8]))add2('doc',10,'info',`Упражнений ждут разрешения врача: ${B.ft.t.filter(T=>T[8]).length}`,'Когда врач разрешит нагрузку на плечо, отметь это в профиле: упражнения откроются.',['Профиль',"go('d')"]);
+ const hid=st.advh||{};return R.filter(q=>hid[q.id]!=td).sort((a,b)=>b.pri-a.pri)}
+const KC={warn:'var(--warn)',good:'var(--r5)',plan:'var(--fg)',info:'var(--dim)'},KI={warn:'!',good:'★',plan:'›',info:'·'};
+function advCard(q){return `<div class="rw" style="cursor:default;align-items:flex-start;border-left:3px solid ${KC[q.k]}"><b style="color:${KC[q.k]};width:16px">${KI[q.k]}</b><span class="n"><b>${esc(q.title)}</b><br><span class="dim">${esc(q.text)}</span>${q.act?`<br><button style="margin-top:6px;min-height:36px;padding:4px 10px" onclick="closeS();${q.act[1]}">${q.act[0]}</button>`:''}</span><button style="flex:0;border:0;min-width:36px" title="Скрыть до завтра" onclick="advHide('${q.id}')">×</button></div>`}
+function advHide(id){st.advh=st.advh||{};const td=day();Object.keys(st.advh).forEach(k=>{if(st.advh[k]!=td)delete st.advh[k]});st.advh[id]=td;saveLocal();if(SH.style.display=='block'&&$('advs'))advSheet();render()}
+function advPanel(){const a=advise();if(!a.length)return '';return `<div class="pn"><b>[СИСТЕМА] СОВЕТНИК</b>${a.slice(0,3).map(advCard).join('')}<div class="row"><button onclick="advSheet()">${a.length>3?'Все советы ('+a.length+') и разбор недели':'Разбор недели'}</button></div></div>`}
+/* РАЗБОР НЕДЕЛИ: последние 7 дней против 7 дней до них, и предложение фокуса на следующую неделю */
+function review(){const now=Date.now(),W=7*DAY,c=st.log.filter(e=>e.t>=now-W&&!e.m),p=st.log.filter(e=>e.t>=now-2*W&&e.t<now-W&&!e.m),xs=a=>a.reduce((s,e)=>s+e.x,0),dys=a=>new Set(a.map(e=>day(new Date(e.t)))).size;
+ const by=a=>{const o={};a.forEach(e=>{if(AV(e.b))o[e.b]=(o[e.b]||0)+e.x});return o},bc=by(c),bp=by(p),top=Object.entries(bc).sort((a,b)=>b[1]-a[1])[0];
+ let drop=null;Object.keys(bp).forEach(b=>{const d=(bc[b]||0)-bp[b];if(d<0&&(!drop||d<drop[1]))drop=[b,d]});
+ const ex=st.ex.filter(e=>e.t>=now-W);
+ let h=`<div class="pn"><b>РАЗБОР НЕДЕЛИ</b> <span class="dim">(7 дней к 7 дням до них)</span><br>XP: <b>${xs(c)}</b> (было ${xs(p)}) · активных дней: <b>${dys(c)}</b> из 7 (было ${dys(p)}) · записей: ${c.length}`;
+ if(top)h+=`<br>Лучшая ветка: <b>${esc(B[top[0]].n)}</b>, +${top[1]} XP`;if(drop)h+=`<br>Больше всего просела: <b>${esc(B[drop[0]].n)}</b>, ${drop[1]} XP`;if(ex.length)h+=`<br>Экзамены сдано: ${ex.length} (${ex.map(e=>esc(B[e.b].n)+' → '+(e.b=='pl'?B.pl.L[e.r]:RN[e.r])).join(', ')})`;
+ if(!c.length&&!p.length)h+='<br><span class="dim">Пока мало записей для разбора. Он наполнится через неделю.</span>';
+ /* фокус: ближе всего к экзамену + заброшенная + просевшая */
+ const cand=[];const q=nextUp();if(q)cand.push(q.b);if(drop&&!cand.includes(drop[0]))cand.push(drop[0]);
+ Object.keys(B).filter(b=>AV(b)&&b!='pl'&&!cand.includes(b)).map(b=>[b,Math.max(0,...st.log.filter(e=>e.b==b).map(e=>e.t))]).sort((a,b)=>a[1]-b[1]).slice(0,3-cand.length).forEach(([b])=>cand.push(b));
+ const f=cand.slice(0,3),same=f.length==3&&f.every(b=>st.foc.includes(b));
+ h+=`<br><br><b>Фокус на следующую неделю:</b> ${f.map(b=>`<span style="color:var(--c${sph(b)})">${esc(B[b].n)}</span>`).join(', ')}<br><span class="dim">Ближайший экзамен, просевшая ветка и та, к которой дольше всего не возвращался.</span>${same?'':`<div class="row"><button onclick="st.foc=${JSON.stringify(f).replace(/"/g,"'")};st.fpr=st.fw;save();toast('> ФОКУС НЕДЕЛИ ОБНОВЛЁН');advSheet();render()">Поставить этот фокус</button></div>`}</div>`;return h}
+function advSheet(){cur='';const a=advise(),G=[['warn','Внимание'],['plan','Что сделать'],['good','Хорошие новости'],['info','Наблюдения']];
+ let h=`<div class="box" id="advs"><h2>[СИСТЕМА] СОВЕТНИК</h2><span class="dim">Подсказки считаются по твоим записям прямо на устройстве, без внешнего ИИ. Закрытые PIN-ветки не учитываются, пока не открыты. × скрывает совет до завтра.</span>`+review();
+ G.forEach(([k,n])=>{const x=a.filter(q=>q.k==k);if(x.length)h+=`<div class="pn"><b style="color:${KC[k]}">${n.toUpperCase()}</b>${x.map(advCard).join('')}</div>`});
+ if(!a.length)h+='<p>Пока советов нет: всё идёт по плану.</p>';
+ SH.innerHTML=h+`<button onclick="closeS()">Закрыть</button></div>`;SH.style.display='block'}
 /* ДАННЫЕ */
 function rep(){const n=P=='w'?7:30,now=Date.now(),a=now-n*DAY,p=a-n*DAY,cu=st.log.filter(e=>e.t>=a),pv=st.log.filter(e=>e.t>=p&&e.t<a);
  if(!cu.length&&!pv.length)return '<p>НЕДОСТАТОЧНО ДАННЫХ. Записывай задания или добавь демо-данные.</p>';
@@ -338,7 +497,7 @@ function vD(){let h=`<div class="pn"><h1>[СИСТЕМА] ДАННЫЕ</h1><div 
  <div class="pn"><b>ЖУРНАЛ</b> <span class="dim">(отмена возможна 24 часа)</span>`;
  st.log.filter(e=>!e.m).slice(-12).reverse().forEach(e=>{const T=B[e.b].t[e.i]||['?',''];h+=`<div class="row"><span>${day(new Date(e.t)).slice(5)} · ${lk(e.b)?'ЗАСЕКРЕЧЕНО':T[0]+': '+(e.sets?e.sets.map(s=>s[0]+'×'+s[1]).join(' '):e.v+' '+T[1])} · +${e.x} XP</span>${Date.now()-e.t<DAY?`<button onclick="rm(${e.t})">Отмена</button>`:'<span class="dim" style="flex:0">заперто</span>'}</div>`});
  const hasDemo=st.log.some(e=>e.demo);
- h+=`</div>`+accPanel()+`<div class="pn"><b>ИНСТРУМЕНТЫ</b><div class="row">${hasDemo?'<button onclick="undemo()">Убрать демо</button>':'<button onclick="demo()">Демо-данные</button>'}<button onclick="$('ex').value=JSON.stringify(st)">Экспорт</button><button onclick="imp()">Импорт</button><button id="rs" onclick="reset()">Сброс</button></div>${hasDemo?'<span class="dim">Сейчас в журнале есть демо-записи. Кнопка «Убрать демо» удалит только их.</span>':''}<textarea id="ex" style="width:100%;height:70px" placeholder="Резервная копия: нажми Экспорт и скопируй текст. Для импорта вставь текст сюда."></textarea></div>`;$('d').innerHTML=h}
+ h+=`</div>`+profPanel()+setPanel()+accPanel()+`<div class="pn"><b>ИНСТРУМЕНТЫ</b><div class="row">${hasDemo?'<button onclick="undemo()">Убрать демо</button>':'<button onclick="demo()">Демо-данные</button>'}<button onclick="$('ex').value=JSON.stringify(st)">Экспорт</button><button onclick="imp()">Импорт</button><button id="rs" onclick="reset()">Сброс</button></div>${hasDemo?'<span class="dim">Сейчас в журнале есть демо-записи. Кнопка «Убрать демо» удалит только их.</span>':''}<textarea id="ex" style="width:100%;height:70px" placeholder="Резервная копия: нажми Экспорт и скопируй текст. Для импорта вставь текст сюда."></textarea></div>`;$('d').innerHTML=h}
 /* Демо-записи помечены и удаляются отдельно, не трогая настоящие. Закрытые PIN-ветки демо не получают */
 function demo(){const ks=Object.keys(B).filter(b=>!LKG[b]&&b!='pl'),now=Date.now();
  for(let d=0;d<60;d++){if(Math.random()<.3)continue;for(let j=0;j<3;j++){const b=ks[Math.floor(Math.random()*ks.length)],i=Math.floor(Math.random()*2),T=B[b].t[i];if(T[9])continue;st.log.push({t:Math.round(now-d*DAY-Math.random()*8e6),b,i,v:T[1]=='мин'?10+Math.floor(Math.random()*50):1+Math.floor(Math.random()*5),x:T[2],demo:1})}}
@@ -369,24 +528,62 @@ async function push(){if(!sb||!user)return;if(busy){again=1;return}busy=1;
   sync='Синхронизировано '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
  catch(e){sync='Нет связи с облаком. Данные сохранены на устройстве, отправлю позже'}
  busy=0;if(tab=='d'&&!SH.style.display.includes('block'))vD();if(again){again=0;push()}}
-async function pull(){if(!sb||!user||busy)return;busy=1;
+async function pull(){if(!sb||!user)return;if(busy){await new Promise(r=>setTimeout(r,600));if(busy)return}busy=1;
  try{const r=await fetchRemote();if(r){const before=JSON.stringify(st);st=merge(st,r);if(JSON.stringify(st)!=before){saveLocal();render()}}sync='Синхронизировано '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
  catch(e){sync='Нет связи с облаком'}busy=0;push()}
 function accPanel(){if(!sb)return `<div class="pn"><b>ОБЛАКО</b><br><span class="dim">Библиотека облака не загрузилась. Приложение работает только на этом устройстве.</span></div>`;
  if(user)return `<div class="pn"><b>ОБЛАКО</b><br>Аккаунт: ${esc(user.email||'')}<br><span class="dim">${esc(sync||'Синхронизация…')}</span><div class="row"><button onclick="push()">Синхронизировать</button><button onclick="logout()">Выйти</button></div><span class="dim">Записи сохраняются на устройстве и отправляются в облако. Видишь их только ты.</span></div>`;
- return `<div class="pn"><b>ОБЛАКО</b><br><span class="dim">Войди, чтобы данные хранились в облаке и были на всех устройствах. Без входа всё хранится только в этом браузере.</span>
- <input id="em" type="email" autocomplete="email" placeholder="почта" style="width:100%;margin:6px 0"><input id="pw" type="password" autocomplete="current-password" placeholder="пароль (от 8 символов)" style="width:100%;margin:0 0 6px">
- <div class="row"><button onclick="login()">Войти</button><button onclick="signup()">Регистрация</button><button onclick="forgot()">Забыл пароль</button></div></div>`}
+ return ''}
 const creds=()=>{const e=$('em').value.trim(),p=$('pw').value;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){toast('> ВВЕДИ ПОЧТУ');return null}return{email:e,password:p}};
 const here=()=>location.origin+location.pathname;
 async function login(){const c=creds();if(!c)return;const{error}=await sb.auth.signInWithPassword(c);if(error)return toast('> НЕ ВОШЁЛ: неверная почта или пароль');toast('> ВХОД ВЫПОЛНЕН')}
 async function signup(){const c=creds();if(!c)return;if(c.password.length<8)return toast('> ПАРОЛЬ: МИНИМУМ 8 СИМВОЛОВ');const{data,error}=await sb.auth.signUp({...c,options:{emailRedirectTo:here()}});if(error)return toast('> ОШИБКА РЕГИСТРАЦИИ: '+error.message);toast(data.session?'> АККАУНТ СОЗДАН':'> ПРОВЕРЬ ПОЧТУ И ПОДТВЕРДИ АДРЕС')}
 async function forgot(){const e=$('em').value.trim();if(!e)return toast('> ВВЕДИ ПОЧТУ');await sb.auth.resetPasswordForEmail(e,{redirectTo:here()});toast('> ЕСЛИ АККАУНТ ЕСТЬ, ПИСЬМО ОТПРАВЛЕНО')}
-async function logout(){await push();await sb.auth.signOut();toast('> ВЫХОД. ДАННЫЕ ОСТАЛИСЬ НА УСТРОЙСТВЕ');render()}
+/* Выход: сначала отправляем всё в облако, потом стираем копию с устройства, чтобы следующий вошедший её не увидел */
+let lo=0;
+async function logout(){await push();if(sync.startsWith('Нет связи')&&!lo){lo=1;setTimeout(()=>lo=0,4000);return toast('> НЕТ СВЯЗИ: последние записи не ушли в облако. Нажми «Выйти» ещё раз, чтобы выйти и потерять их')}
+ lo=0;await sb.auth.signOut();try{localStorage.removeItem(K);localStorage.removeItem(K+'_bak')}catch(e){}st=fresh();un={};closeS();tab='s';toast('> ВЫХОД ВЫПОЛНЕН');render()}
+/* Экран входа: без аккаунта приложением пользоваться нельзя */
+function gate(on){const G=$('gate');if(!on){G.style.display='none';G.innerHTML='';G.dataset.f='';return}if(G.dataset.f)return;G.dataset.f='1';
+ G.innerHTML=`<div class="pn"><h1>[СИСТЕМА] ВХОД</h1><span class="dim">Войди, чтобы продолжить. Данные хранятся в облаке и доступны на всех твоих устройствах.</span>
+ <form onsubmit="event.preventDefault();login()" style="margin-top:10px"><input id="em" type="email" autocomplete="email" placeholder="почта" required><input id="pw" type="password" autocomplete="current-password" placeholder="пароль (от 8 символов)" required>
+ <div class="row"><button type="submit">Войти</button><button type="button" onclick="signup()">Регистрация</button></div><button type="button" onclick="forgot()" style="border-color:var(--dim);color:var(--dim)">Забыл пароль</button></form></div>`;G.style.display='block'}
 function newPw(){SH.innerHTML=`<div class="box"><h2>НОВЫЙ ПАРОЛЬ</h2><input id="npw" type="password" autocomplete="new-password" placeholder="от 8 символов" style="width:100%"><div class="row"><button onclick="setPw()">Сохранить</button><button onclick="closeS()">Закрыть</button></div></div>`;SH.style.display='block'}
 async function setPw(){const p=$('npw').value;if(p.length<8)return toast('> МИНИМУМ 8 СИМВОЛОВ');const{error}=await sb.auth.updateUser({password:p});if(error)return toast('> ОШИБКА: '+error.message);toast('> ПАРОЛЬ ИЗМЕНЁН');closeS()}
-if(sb)sb.auth.onAuthStateChange((ev,s)=>{const was=user&&user.id;user=s?s.user:null;
+if(sb){$('gate').innerHTML='<div class="pn"><h1>[СИСТЕМА] ЗАГРУЗКА…</h1></div>';$('gate').style.display='block'}
+if(sb)sb.auth.onAuthStateChange((ev,s)=>{const was=user&&user.id;user=s?s.user:null;gate(!user);
  if(ev=='PASSWORD_RECOVERY')setTimeout(newPw,0);
- if(user&&user.id!=was)setTimeout(pull,0);if(!user)sync='';if(tab=='d')setTimeout(vD,0)});
+ if(user&&user.id!=was)setTimeout(async()=>{await pull();if(!st.prof)onb()},0);if(!user)sync='';if(tab=='d')setTimeout(vD,0)});
+/* ПРОФИЛЬ И АНКЕТА */
+const SPORT=['pl','ft','ag'];
+function profPanel(){const p=st.prof;if(!p)return `<div class="pn"><b>ПРОФИЛЬ</b><br><span class="dim">Анкета не заполнена.</span><div class="row"><button onclick="onb()">Заполнить анкету</button></div></div>`;const a=age();
+ return `<div class="pn"><b>ПРОФИЛЬ</b><br>${esc(p.name)}${a!=null?', '+yrs(a):''} · ${p.sex=='f'?'женщина':'мужчина'}${p.h?' · рост '+p.h+' см':''} · вес ${BW()} кг (категория ${B.pl.cls} кг)<br>Допуски: прыжки ${st.doc?'[✓]':'[ ]'} · нагрузка на плечо ${st.ortho?'[✓]':'[ ]'}<div class="row"><button onclick="onb(1)">Изменить анкету</button></div></div>`}
+function setPanel(){return `<div class="pn"><b>НАСТРОЙКИ</b><br>Тема:<div class="chips" style="margin:6px 0">${THEMES.map(([v,n])=>`<button class="${(st.th||'')==v?'on':''}" onclick="setTh('${v}')">${n}</button>`).join('')}</div><div class="row"><button class="${st.crt?'on':''}" onclick="crt()">Эффект ЭЛТ: ${st.crt?'вкл':'выкл'}</button></div></div>`}
+let A=null,As=0;
+function onb(edit){const p=st.prof||{},bs=st.base||{};A={name:p.name||'',bd:p.bd||'',sex:p.sex||'m',h:p.h||'',bw:st.bw||'',b0:bs[0]||'',b1:bs[1]||'',b2:bs[2]||'',jump:!!st.doc,sh:!!st.ortho,lv:{},edit:!!edit};
+ Object.keys(B).forEach(b=>{if(!SPORT.includes(b))A.lv[b]=Math.min(2,st.r[b]||0)});As=0;onbR()}
+function onbGet(){const v=id=>$(id)?$(id).value.trim():null;
+ if(As==0){A.name=v('o_nm');A.bd=v('o_bd')}
+ if(As==1){A.h=+v('o_h')||'';A.bw=+String(v('o_bw')).replace(',','.')||'';A.b0=+v('o_b0')||'';A.b1=+v('o_b1')||'';A.b2=+v('o_b2')||''}}
+function onbOk(){if(As==0){if(!A.name)return toast('> ВВЕДИ ИМЯ');const a=A.bd?(()=>{const b=new Date(A.bd+'T00:00');return(Date.now()-b)/(365.25*DAY)})():NaN;if(!(a>=10&&a<=100))return toast('> ПРОВЕРЬ ДАТУ РОЖДЕНИЯ')}
+ if(As==1){if(!(A.bw>=30&&A.bw<=300))return toast('> ВЕС ТЕЛА: 30–300 КГ');if(A.h&&!(A.h>=100&&A.h<=250))return toast('> РОСТ: 100–250 СМ');if([A.b0,A.b1,A.b2].some(x=>x&&!(x>=10&&x<=500)))return toast('> МАКСИМУМЫ: 10–500 КГ')}
+ return true}
+function onbNav(d){onbGet();if(d>0&&!onbOk())return;As+=d;if(As>3)return onbDone();onbR()}
+function onbR(){const O=$('onb'),stp=['ЗНАКОМСТВО','ТЕЛО И СИЛА','ДОПУСКИ ВРАЧЕЙ','СТАРТОВЫЙ УРОВЕНЬ'];let h=`<div class="pn"><h1>[СИСТЕМА] АНКЕТА</h1><span class="dim">Шаг ${As+1} из 4 · ${stp[As]}</span><br>`;
+ if(As==0)h+=`<span class="dim">По анкете приложение подберёт нормы и стартовые ранги.</span><label>Имя</label><input id="o_nm" maxlength="40" value="${esc(A.name)}" autocomplete="given-name"><label>Дата рождения</label><input id="o_bd" type="date" value="${A.bd}"><label>Пол <span class="dim">(от него зависят нормы)</span></label><div class="row"><button class="${A.sex=='m'?'on':''}" onclick="onbGet();A.sex='m';onbR()">Мужской</button><button class="${A.sex=='f'?'on':''}" onclick="onbGet();A.sex='f';onbR()">Женский</button></div>`;
+ if(As==1){const c=A.bw?wcls(A.sex,A.bw):'—';h+=`<label>Рост, см</label><input id="o_h" type="number" inputmode="numeric" value="${A.h}"><label>Вес тела, кг</label><input id="o_bw" type="number" inputmode="decimal" value="${A.bw}" oninput="$('o_c').textContent=wcls(A.sex,+this.value||0)"><span class="dim">Весовая категория: <b id="o_c">${c}</b> кг</span>
+  <label>Максимумы на 1 повтор, кг <span class="dim">(если не знаешь, оставь пустым: уровень посчитается по тренировкам)</span></label><div class="row"><input id="o_b0" type="number" inputmode="decimal" placeholder="присед" value="${A.b0}"><input id="o_b1" type="number" inputmode="decimal" placeholder="жим лёжа" value="${A.b1}"><input id="o_b2" type="number" inputmode="decimal" placeholder="становая" value="${A.b2}"></div>`}
+ if(As==2)h+=`<span class="dim">Некоторые упражнения закрыты, пока врач не разрешит. Приложение это не проверяет: отметь сам. Это учёт, а не медицинская рекомендация.</span><div class="row"><button class="${A.jump?'on':''}" onclick="A.jump=!A.jump;onbR()">Врач разрешил прыжки</button><button class="${A.sh?'on':''}" onclick="A.sh=!A.sh;onbR()">Врач разрешил нагрузку на плечо</button></div><span class="dim">Если ограничений нет, отметь оба.</span>`;
+ if(As==3){h+=`<span class="dim">Оцени себя в каждой ветке. Выше C · Практик по анкете нельзя: B, A и S даются только за экзамены. Спорт посчитается сам по весам и тренировкам.</span><div class="pn" style="margin:8px 0"><b style="color:var(--r0)">E · Новичок</b>: только начинаю<br><b style="color:var(--r1)">D · Ученик</b>: делаю иногда<br><b style="color:var(--r2)">C · Практик</b>: делаю регулярно</div>`;
+  CL.forEach(([cn,it],ci)=>{const bs=it.flatMap(id=>GR[id]?GR[id].c:[id]).filter(b=>!SPORT.includes(b));if(!bs.length)return;h+=`<br><b style="color:var(--c${ci})">${cn}</b>`;
+   bs.forEach(b=>{const cr=st.r[b]||0;h+=`<div class="row"><span>${esc(B[b].n)}</span>`+(cr>2?`<span class="dim">${RN[cr]} · ${RNN[cr]} (экзамен)</span>`:[0,1,2].map(k=>`<button class="${A.lv[b]==k?'on':''}" style="color:${A.lv[b]==k?'':rcol(k)}" onclick="A.lv['${b}']=${k};onbR()">${RN[k]}</button>`).join(''))+`</div>`})});
+  }
+ h+=`<div class="row" style="margin-top:10px">${As?'<button onclick="onbNav(-1)">Назад</button>':''}<button class="on" onclick="onbNav(1)">${As==3?'Готово':'Далее'}</button>${A.edit?'<button onclick="onbClose()">Отмена</button>':''}</div></div>`;
+ O.innerHTML=h;O.style.display='block';O.scrollTop=0}
+function onbClose(){$('onb').style.display='none';$('onb').innerHTML='';A=null}
+function onbDone(){st.prof={name:A.name,bd:A.bd,sex:A.sex,h:A.h||0};st.bw=A.bw;st.base={0:A.b0||0,1:A.b1||0,2:A.b2||0};st.doc=A.jump;st.ortho=A.sh;st.sx=st.sx||{};
+ Object.keys(A.lv).forEach(b=>{if((st.r[b]||0)>2)return;const er=Math.max(0,...st.ex.filter(e=>e.b==b).map(e=>e.r));st.r[b]=Math.max(er,A.lv[b]);st.sx[b]=TH[A.lv[b]]});
+ const first=!A.edit;onbClose();applyProfile();save();render();toast(first?'> АНКЕТА ПРИНЯТА. ДОБРО ПОЖАЛОВАТЬ, '+st.prof.name.toUpperCase():'> ПРОФИЛЬ ОБНОВЛЁН',first)}
 render();
+if(!sb&&!st.prof)onb();
 </script></body></html>
